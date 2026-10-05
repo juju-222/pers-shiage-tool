@@ -5,70 +5,106 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>建築パース仕上げ</title>
 <style>
-:root{font-family:"Segoe UI",sans-serif;color:#eee;background:#1d1d1d}
-*{box-sizing:border-box}body{margin:0;padding:12px;display:grid;grid-template-columns:280px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;height:100vh;gap:12px}
-header{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-h1{font-size:20px;margin:0 16px 0 0;font-weight:600}
-button,.file{background:#454b52;color:#fff;border:0;border-radius:7px;padding:10px 15px;font:inherit;cursor:pointer;transition:background .15s,box-shadow .15s,transform .15s}
-button:not(:disabled):hover,.file:hover{background:#59616a}.file{background:#9a6425}.file:hover{background:#b9782f}#save{background:#2f78b7}#save:not(:disabled):hover{background:#3d8dce}#compare{background:#4b535b}#compare:not(:disabled):hover{background:#626c76}
-button:disabled{opacity:.5;cursor:default}.file input{display:none}
-.mode-switch{display:flex;gap:6px}.mode-button[data-app-mode="photo"]{background:#365d59;color:#fff}.mode-button[data-app-mode="photo"]:hover{background:#416a65}.mode-button[data-app-mode="photo"].active{background:#4a756f;box-shadow:inset 0 0 0 2px #789992}.mode-button[data-app-mode="texture"]{background:#3f586e;color:#fff}.mode-button[data-app-mode="texture"]:hover{background:#4a657c}.mode-button[data-app-mode="texture"].active{background:#557188;box-shadow:inset 0 0 0 2px #819bad}
-.format-picker{display:flex;align-items:center;gap:7px;color:#ccc;font-size:13px}.format-picker select{background:#30353a;color:#fff;border:1px solid #626a73;border-radius:6px;padding:9px 28px 9px 10px;font:inherit;cursor:pointer}
+:root{font-family:"Segoe UI","Hiragino Sans","Yu Gothic UI",sans-serif;color:#eee;background:#1d1d1d}
+*{box-sizing:border-box}body{margin:0;padding:12px;display:grid;grid-template-columns:300px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;height:100vh;gap:12px;background:#1d1d1d}
+header{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+h1{font-size:20px;margin:0 12px 0 0;font-weight:600}
+button,.file{background:#454b52;color:#fff;border:0;border-radius:7px;padding:9px 13px;font:inherit;font-size:14px;cursor:pointer;transition:background .15s,box-shadow .15s}
+button:not(:disabled):hover,.file:hover{background:#59616a}.file{background:#9a6425}.file:hover{background:#b9782f}#save{background:#2f78b7}#save:not(:disabled):hover{background:#3d8dce}
+button:disabled{opacity:.45;cursor:default}.file input{display:none}button.on{background:#3683d9;box-shadow:inset 0 0 0 2px #8dc5ff}
+.group{display:flex;gap:6px;align-items:center}
+.mode-button[data-app-mode="photo"]{background:#365d59}.mode-button[data-app-mode="photo"].active{background:#4a756f;box-shadow:inset 0 0 0 2px #789992}.mode-button[data-app-mode="texture"]{background:#3f586e}.mode-button[data-app-mode="texture"].active{background:#557188;box-shadow:inset 0 0 0 2px #819bad}
+.format-picker{display:flex;align-items:center;gap:6px;color:#ccc;font-size:13px}.format-picker select{background:#30353a;color:#fff;border:1px solid #626a73;border-radius:6px;padding:8px 26px 8px 9px;font:inherit;font-size:13px;cursor:pointer}
 #info{color:#bbb;font-size:13px}
 .controls{grid-column:1;grid-row:2;min-height:0;overflow-y:auto;background:#282828;padding:14px;border-radius:8px}
-.controls.hidden{display:none}.texture-controls{display:none}.texture-controls.active{display:block}.texture-note{color:#bbb;font-size:12px;line-height:1.5;margin:12px 0 0}
+.controls.hidden{display:none}.texture-controls{display:none}.texture-controls.active{display:block}.note{color:#aaa;font-size:12px;line-height:1.55;margin:4px 0 0}
+.histo{margin-bottom:12px}.histo canvas{width:100%;height:70px;display:block;background:#1b1b1b;border-radius:5px}.clip-info{display:flex;justify-content:space-between;font-size:11px;color:#999;margin-top:4px}.clip-info .warn{color:#ff8a7a}
 .preset-panel{border:1px solid #465953;border-radius:6px;margin-bottom:12px;padding:8px;font-size:12px}.preset-panel summary{cursor:pointer;color:#d2e1dc;font-weight:600}.preset-row{display:flex;gap:5px;margin-top:8px;align-items:center}.preset-row select,.preset-row input{min-width:0;flex:1;width:0;background:#303735;color:#eee;border:1px solid #63746e;border-radius:4px;padding:7px;font:inherit}.preset-row button{padding:7px 8px;font-size:12px;border-radius:4px;background:#46635b}.preset-note{margin:7px 0 0;color:#bbb;font-size:11px;line-height:1.5}.preset-status{color:#d2e1dc;line-height:1.5;overflow-wrap:anywhere}.preset-status:empty{display:none}.preset-status:not(:empty){margin-top:6px}
 .map-tabs{display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:16px}.map-tab{background:#3b3b3b;color:#ddd;padding:8px 10px}.map-tab.active{background:#3683d9;color:#fff}
-.map-panel{display:none;flex-direction:column;gap:10px}.map-panel.current{display:flex}.check-row{display:flex!important;justify-content:flex-start!important;align-items:center;gap:8px!important}
-.effect-picker{margin-bottom:14px}.effect-picker-title{display:block;margin-bottom:7px;font-size:13px;font-weight:600;color:#ccc}.effect-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}.effect-tab{min-height:34px;padding:6px 4px;border-radius:4px;background:#3b3b3b;color:#ddd;font-size:12px;line-height:1.15}.effect-tab.active{background:#3683d9;color:#fff;box-shadow:inset 0 0 0 1px #8dc5ff}
+.map-panel{display:none;flex-direction:column;gap:10px}.map-panel.current{display:flex}.check-row{display:flex!important;justify-content:flex-start!important;align-items:center;gap:8px!important;cursor:pointer}
+.effect-picker{margin-bottom:14px}.effect-picker-title{display:block;margin-bottom:7px;font-size:13px;font-weight:600;color:#ccc}.effect-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}.effect-tab{position:relative;min-height:34px;padding:6px 4px;border-radius:4px;background:#3b3b3b;color:#ddd;font-size:12px;line-height:1.15}.effect-tab.active{background:#3683d9;color:#fff;box-shadow:inset 0 0 0 1px #8dc5ff}.effect-tab.changed::after{content:"";position:absolute;top:5px;right:6px;width:6px;height:6px;border-radius:50%;background:#ffb347}
 .control{display:none;flex-direction:column;gap:8px;margin:0}.control.current{display:flex}
-.control label{display:flex;justify-content:space-between;gap:8px}
-.scope-row{display:flex;align-items:center;gap:7px}.scope{flex:1;background:#444;padding:8px 10px;font-size:13px}.scope.active{background:#3683d9}.scope-edit{display:none;color:#9dccff;font-size:12px}.control.local .scope-edit{display:block}.control.editing{outline:2px solid #6cb0ff;outline-offset:5px;border-radius:4px}.scope-radius{display:none}.control.local .scope-radius{display:block}
+.control label{display:flex;justify-content:space-between;gap:8px;font-size:14px}
+.scope-row{display:flex;align-items:center;gap:7px;margin-top:6px}.scope{flex:1;background:#444;padding:8px 10px;font-size:13px}.scope.active{background:#3683d9}.control.editing{outline:2px solid #6cb0ff;outline-offset:5px;border-radius:4px}.scope-radius{display:none}.control.local .scope-radius{display:block}
 input[type=range]{width:100%;accent-color:#6cb0ff}.ends{display:flex;justify-content:space-between;color:#b9b9b9;font-size:12px}
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.seg button{padding:7px 4px;font-size:12px;border-radius:4px;background:#3b3b3b}.seg button.active{background:#3683d9}
+#curveCanvas{width:100%;aspect-ratio:1;display:block;background:#1b1b1b;border-radius:5px;touch-action:none;cursor:crosshair}
+.row-buttons{display:flex;gap:6px}.row-buttons button{flex:1;font-size:12px;padding:8px 6px;border-radius:5px}
+.color-row{align-items:center}.color-row input{width:56px;height:30px;border:0;background:none;padding:0;cursor:pointer}
 main{grid-column:2;grid-row:2;min-width:0;min-height:0;background:#282828;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:background .15s,box-shadow .15s}
 main.drag-over{background:#26384c;box-shadow:inset 0 0 0 3px #6cb0ff}
-canvas{display:block;max-width:100%;max-height:100%;cursor:crosshair}
+#stage{position:relative;display:none}main.has-image #stage{display:block}
+#preview{display:block;width:100%;height:100%}#overlay{position:absolute;left:0;top:0;width:100%;height:100%;cursor:crosshair;touch-action:none}#overlay.brush{cursor:none}
 #dropHint{position:absolute;inset:18px;border:2px dashed #666;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:15px;pointer-events:none;transition:border-color .15s,color .15s,background .15s}
 main.has-image #dropHint{display:none}main.drag-over #dropHint{display:flex;border-color:#9dccff;color:#fff;background:rgba(54,131,217,.16)}
+#loupe{position:absolute;width:260px;height:260px;border:2px solid #fff;border-radius:6px;box-shadow:0 4px 18px rgba(0,0,0,.6);pointer-events:none;background:#000}#loupe[hidden]{display:none}
 #message{grid-column:1/-1;min-height:1.3em;color:#bbb;font-size:13px}
-@media(max-width:760px){body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto auto}.controls{grid-column:1;grid-row:3;max-height:38vh}main{grid-column:1;grid-row:2}}
+@media(max-width:760px){body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto auto;height:auto;min-height:100vh}.controls{grid-column:1;grid-row:3;max-height:42vh}main{grid-column:1;grid-row:2;min-height:50vh}}
 </style>
 </head>
 <body>
 <header>
 <h1>建築パース仕上げ</h1>
-<div class="mode-switch" aria-label="作業モード"><button type="button" class="mode-button active" data-app-mode="photo">写真調整</button><button type="button" class="mode-button" data-app-mode="texture">テクスチャマップ</button></div>
+<div class="group" aria-label="作業モード"><button type="button" class="mode-button active" data-app-mode="photo">写真調整</button><button type="button" class="mode-button" data-app-mode="texture">テクスチャマップ</button></div>
 <label class="file">画像を開く<input id="file" type="file" accept="image/png,image/jpeg,image/webp"></label>
+<div class="group"><button type="button" id="undo" title="元に戻す（Ctrl+Z）" disabled>↶ 元に戻す</button><button type="button" id="redo" title="やり直す（Ctrl+Shift+Z または Ctrl+Y）" disabled>↷ やり直す</button><button type="button" id="resetAll" disabled>すべてリセット</button></div>
 <label class="format-picker" for="saveFormat">保存形式 <select id="saveFormat"><option value="jpeg" selected>JPEG</option><option value="png">PNG</option></select></label>
-<button id="save" disabled>高画質JPEGで保存</button>
-<button id="compare" disabled>元画像と比較</button>
+<label class="format-picker" for="saveDpi">解像度 <select id="saveDpi"><option value="72">72 dpi</option><option value="150">150 dpi</option><option value="300">300 dpi</option><option value="350" selected>350 dpi（印刷）</option><option value="400">400 dpi</option></select></label>
+<button type="button" id="save" disabled>高画質JPEGで保存</button>
+<button type="button" id="compare" disabled>元画像と比較</button>
+<button type="button" id="loupeBtn" disabled title="カーソルの場所を保存時と同じ大きさ（等倍）で表示します">拡大鏡（等倍）</button>
 <span id="info">画像を選んでください</span>
 </header>
 <section class="controls" id="photoControls">
+<div class="histo"><canvas id="histogram" width="560" height="140"></canvas><div class="clip-info"><span id="clipLow">黒つぶれ –</span><span id="clipHigh">白とび –</span></div></div>
 <details class="preset-panel">
 <summary>写真プリセット</summary>
 <div class="preset-row"><select id="presetList" aria-label="保存したプリセット"><option value="">プリセットを選択</option></select><button type="button" id="presetApply" disabled>適用</button><button type="button" id="presetDelete" disabled>削除</button></div>
 <div class="preset-row"><input id="presetName" type="text" maxlength="80" placeholder="保存する名前" aria-label="プリセット名"><button type="button" id="presetSave">保存</button></div>
-<p class="preset-note">調整値と範囲を保存（画像は含みません）。このブラウザ・同じ開き方で使えます。</p>
+<p class="preset-note">調整値・範囲・トーンカーブを保存（画像とブラシで塗った内容は含みません）。このブラウザ・同じ開き方で使えます。</p>
 <div id="presetStatus" class="preset-status" role="status" aria-live="polite"></div>
 </details>
-<div class="effect-picker"><span class="effect-picker-title">調整項目</span><div class="effect-tabs" id="effectTabs">
+<div class="effect-picker"><span class="effect-picker-title">調整項目（オレンジの点＝調整済み）</span><div class="effect-tabs" id="effectTabs">
 <button type="button" class="effect-tab active" data-effect-tab="brightness">明るさ</button><button type="button" class="effect-tab" data-effect-tab="contrast">コントラスト</button>
 <button type="button" class="effect-tab" data-effect-tab="highlights">明るい部分</button><button type="button" class="effect-tab" data-effect-tab="shadows">暗い部分</button>
-<button type="button" class="effect-tab" data-effect-tab="saturation">彩度</button><button type="button" class="effect-tab" data-effect-tab="temperature">色温度</button>
-<button type="button" class="effect-tab" data-effect-tab="vignette">周辺減光</button><button type="button" class="effect-tab" data-effect-tab="blur">ぼかし</button>
-<button type="button" class="effect-tab" data-effect-tab="grain">粒状感</button><button type="button" class="effect-tab" data-effect-tab="sharpness">シャープ</button>
+<button type="button" class="effect-tab" data-effect-tab="curve">トーンカーブ</button><button type="button" class="effect-tab" data-effect-tab="saturation">彩度</button>
+<button type="button" class="effect-tab" data-effect-tab="temperature">色温度</button><button type="button" class="effect-tab" data-effect-tab="brush">ブラシ</button>
+<button type="button" class="effect-tab" data-effect-tab="glow">光のにじみ</button><button type="button" class="effect-tab" data-effect-tab="vignette">周辺減光</button>
+<button type="button" class="effect-tab" data-effect-tab="blur">ぼかし</button><button type="button" class="effect-tab" data-effect-tab="sharpness">シャープ</button>
+<button type="button" class="effect-tab" data-effect-tab="grain">粒状感（ノイズ）</button>
 </div></div>
-<div class="control" data-effect="brightness"><label for="brightness">明るさ <span id="bv">0.00 EV</span></label><input id="brightness" type="range" min="-2" max="2" step="0.05" value="0"><div class="ends"><span>暗い</span><span>明るい</span></div></div>
-<div class="control" data-effect="contrast"><label for="contrast">コントラスト <span id="cv">100%</span></label><input id="contrast" type="range" min="0" max="200" step="1" value="100"><div class="ends"><span>やわらかい</span><span>くっきり</span></div></div>
-<div class="control" data-effect="highlights"><label for="highlights">明るい部分 <span id="hv">0</span></label><input id="highlights" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>暗くする</span><span>明るくする</span></div></div>
-<div class="control" data-effect="shadows"><label for="shadows">暗い部分 <span id="shv">0</span></label><input id="shadows" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>暗くする</span><span>明るくする</span></div></div>
-<div class="control" data-effect="saturation"><label for="saturation">彩度 <span id="satv">100%</span></label><input id="saturation" type="range" min="0" max="200" step="1" value="100"><div class="ends"><span>色を抑える</span><span>鮮やか</span></div></div>
-<div class="control" data-effect="temperature"><label for="temperature">色温度 <span id="tv">0</span></label><input id="temperature" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>冷たい色</span><span>暖かい色</span></div></div>
-<div class="control" data-effect="vignette"><label for="vignette">周辺減光 <span id="vv">0</span></label><input id="vignette" type="range" min="0" max="100" step="1" value="0"><div class="ends"><span>変えない</span><span>暗く</span></div></div>
-<div class="control" data-effect="blur"><label for="blur">ぼかし <span id="blv">0 px</span></label><input id="blur" type="range" min="0" max="60" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div></div>
-<div class="control" data-effect="grain"><label for="grain">粒状感 <span id="gv">0</span></label><input id="grain" type="range" min="0" max="30" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div><label for="size">粒子サイズ <span id="sv">1 px</span></label><input id="size" type="range" min="1" max="4" step="1" value="1"></div>
-<div class="control" data-effect="sharpness"><label for="sharpness">シャープ <span id="sharpv">0</span></label><input id="sharpness" type="range" min="0" max="100" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div></div>
+<div class="control" data-effect="brightness"><label for="brightness">明るさ <span data-out="brightness"></span></label><input id="brightness" type="range" min="-2" max="2" step="0.05" value="0"><div class="ends"><span>暗い</span><span>明るい</span></div><p class="note">明るくしても白い部分が急に真っ白にならないよう、ゆるやかに明るくなります。</p></div>
+<div class="control" data-effect="contrast"><label for="contrast">コントラスト <span data-out="contrast"></span></label><input id="contrast" type="range" min="0" max="200" step="1" value="100"><div class="ends"><span>やわらかい</span><span>くっきり</span></div></div>
+<div class="control" data-effect="highlights"><label for="highlights">明るい部分 <span data-out="highlights"></span></label><input id="highlights" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>暗くする</span><span>明るくする</span></div><p class="note">マイナスにすると、白っぽくなった窓の外などが見えやすくなります。</p></div>
+<div class="control" data-effect="shadows"><label for="shadows">暗い部分 <span data-out="shadows"></span></label><input id="shadows" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>暗くする</span><span>明るくする</span></div></div>
+<div class="control" data-effect="curve">
+<div class="seg" id="curveChannels"><button type="button" class="active" data-channel="rgb">RGB</button><button type="button" data-channel="r">赤</button><button type="button" data-channel="g">緑</button><button type="button" data-channel="b">青</button></div>
+<canvas id="curveCanvas" width="520" height="520"></canvas>
+<div class="row-buttons"><button type="button" id="curveS">S字（メリハリ）</button><button type="button" id="curveReset">このカーブを戻す</button></div>
+<p class="note">線の上をクリックすると点が増えます。点をドラッグして形を変えます。点をダブルクリックするか、枠の外へ引っぱると消えます。</p>
+</div>
+<div class="control" data-effect="saturation"><label for="saturation">彩度 <span data-out="saturation"></span></label><input id="saturation" type="range" min="0" max="200" step="1" value="100"><div class="ends"><span>色を抑える</span><span>鮮やか</span></div></div>
+<div class="control" data-effect="temperature"><label for="temperature">色温度 <span data-out="temperature"></span></label><input id="temperature" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>冷たい色</span><span>暖かい色</span></div><p class="note">黒い影には色がつかないようにしています。</p></div>
+<div class="control" data-effect="brush">
+<div class="seg" id="brushModes"><button type="button" class="active" data-brush="light">明るく</button><button type="button" data-brush="dark">暗く</button><button type="button" data-brush="color">色</button><button type="button" data-brush="erase">消しゴム</button></div>
+<label class="color-row" for="brushColor" id="brushColorRow">のせる色 <input id="brushColor" type="color" value="#ffc98a"></label>
+<label for="brushSize">ブラシの大きさ <span data-out="brushSize"></span></label><input id="brushSize" type="range" min="1" max="60" step="1" value="12">
+<label for="brushHardness">ふちの硬さ <span data-out="brushHardness"></span></label><input id="brushHardness" type="range" min="0" max="100" step="1" value="0">
+<label for="brushFlow">1回で塗る濃さ <span data-out="brushFlow"></span></label><input id="brushFlow" type="range" min="1" max="100" step="1" value="12">
+<label for="paintOpacity">塗った効果の強さ（全体） <span data-out="paintOpacity"></span></label><input id="paintOpacity" type="range" min="0" max="100" step="1" value="100">
+<label class="check-row"><input id="showPaint" type="checkbox"> 塗った場所を水色で表示</label>
+<button type="button" id="paintClear">ブラシで塗った内容をすべて消す</button>
+<p class="note">Photoshopの「ソフトライトのレイヤー＋ブラシ」と同じ仕組みです。画像の上をドラッグして塗ります。キーボードの［ ］キーで大きさを変えられます。</p>
+</div>
+<div class="control" data-effect="glow"><label for="glow">光のにじみ <span data-out="glow"></span></label><input id="glow" type="range" min="0" max="100" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div>
+<label for="glowRadius">にじむ広さ <span data-out="glowRadius"></span></label><input id="glowRadius" type="range" min="1" max="100" step="1" value="35">
+<label for="glowThreshold">にじませる明るさ <span data-out="glowThreshold"></span></label><input id="glowThreshold" type="range" min="50" max="98" step="1" value="80"><div class="ends"><span>少し明るい所も</span><span>強い光だけ</span></div>
+<p class="note">照明や明るい窓の光を、ふわっとにじませます。</p></div>
+<div class="control" data-effect="vignette"><label for="vignette">周辺減光 <span data-out="vignette"></span></label><input id="vignette" type="range" min="0" max="100" step="1" value="0"><div class="ends"><span>変えない</span><span>暗く</span></div></div>
+<div class="control" data-effect="blur"><label for="blur">ぼかし <span data-out="blur"></span></label><input id="blur" type="range" min="0" max="60" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div><p class="note">「範囲」を選ぶと、円の中はくっきりのまま外側だけぼけます。</p></div>
+<div class="control" data-effect="sharpness"><label for="sharpness">シャープ <span data-out="sharpness"></span></label><input id="sharpness" type="range" min="0" max="100" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div></div>
+<div class="control" data-effect="grain"><label for="grain">粒状感 <span data-out="grain"></span></label><input id="grain" type="range" min="0" max="30" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div><label for="size">粒子サイズ <span data-out="size"></span></label><input id="size" type="range" min="1" max="4" step="1" value="1"><p class="note">ノイズは一番最後に入るので、シャープやぼかしの影響を受けません。細かい粒は「拡大鏡（等倍）」で確認すると保存後と同じ見え方になります。</p></div>
+<p class="note">ヒント：スライダーをダブルクリックすると初期値に戻ります。</p>
 </section>
 <section class="controls texture-controls" id="textureControls">
 <div class="effect-picker"><span class="effect-picker-title">生成するマップ</span><div class="map-tabs" id="mapTabs">
@@ -77,174 +113,476 @@ main.has-image #dropHint{display:none}main.drag-over #dropHint{display:flex;bord
 <button type="button" class="map-tab" data-map="height">ハイトマップ</button>
 </div></div>
 <div class="map-panel current" data-map-panel="normal">
-<label for="normalStrength">凹凸の強さ <span id="normalStrengthValue">2.0</span></label><input id="normalStrength" type="range" min="0.2" max="6" step="0.1" value="2">
-<label for="normalSmooth">なめらかさ <span id="normalSmoothValue">1 px</span></label><input id="normalSmooth" type="range" min="0" max="8" step="1" value="1">
-<label class="check-row"><input id="normalInvertY" type="checkbox"> 緑（Y）方向を反転</label>
+<label for="normalStrength">凹凸の強さ <span id="normalStrengthValue">2.0</span></label><input id="normalStrength" class="tex" type="range" min="0.2" max="6" step="0.1" value="2">
+<label for="normalSmooth">なめらかさ <span id="normalSmoothValue">1 px</span></label><input id="normalSmooth" class="tex" type="range" min="0" max="8" step="1" value="1">
+<label class="check-row"><input id="normalInvertY" class="tex" type="checkbox"> 緑（Y）方向を反転</label>
 </div>
 <div class="map-panel" data-map-panel="ao">
-<label for="aoStrength">影の強さ <span id="aoStrengthValue">65%</span></label><input id="aoStrength" type="range" min="0" max="100" step="1" value="65">
-<label for="aoRadius">影の広がり <span id="aoRadiusValue">6 px</span></label><input id="aoRadius" type="range" min="1" max="24" step="1" value="6">
+<label for="aoStrength">影の強さ <span id="aoStrengthValue">65%</span></label><input id="aoStrength" class="tex" type="range" min="0" max="100" step="1" value="65">
+<label for="aoRadius">影の広がり <span id="aoRadiusValue">6 px</span></label><input id="aoRadius" class="tex" type="range" min="1" max="24" step="1" value="6">
 </div>
 <div class="map-panel" data-map-panel="height">
-<label for="heightContrast">高低差 <span id="heightContrastValue">120%</span></label><input id="heightContrast" type="range" min="20" max="300" step="1" value="120">
-<label for="heightSmooth">なめらかさ <span id="heightSmoothValue">1 px</span></label><input id="heightSmooth" type="range" min="0" max="12" step="1" value="1">
-<label class="check-row"><input id="heightInvert" type="checkbox"> 白黒を反転</label>
+<label for="heightContrast">高低差 <span id="heightContrastValue">120%</span></label><input id="heightContrast" class="tex" type="range" min="20" max="300" step="1" value="120">
+<label for="heightSmooth">なめらかさ <span id="heightSmoothValue">1 px</span></label><input id="heightSmooth" class="tex" type="range" min="0" max="12" step="1" value="1">
+<label class="check-row"><input id="heightInvert" class="tex" type="checkbox"> 白黒を反転</label>
 </div>
-<p class="texture-note">明るさを高さとして解析します。マップは元画像と同じ解像度のPNGで保存されます。</p>
+<p class="note">明るさを高さとして解析します。マップは元画像と同じ解像度で保存されます。</p>
 </section>
-<main><canvas id="preview"></canvas><div id="dropHint">画像をここにドロップ</div></main>
-<div id="message">画像は縮小表示です。保存は元解像度。各項目の「範囲」で個別のピンと円を設定できます。</div>
+<main><div id="stage"><canvas id="preview"></canvas><canvas id="overlay"></canvas></div><div id="dropHint">画像をここにドロップ</div><canvas id="loupe" width="260" height="260" hidden></canvas></main>
+<div id="message">画像は縮小表示です。保存は元の解像度で行います。</div>
+
+<script id="engine">
+"use strict";
+/* ===== 画像処理エンジン（画面表示と保存の両方で同じ処理を使う） ===== */
+const LUT_N=1024,LIN_N=8192;
+function clamp01(v){return v<0?0:v>1?1:v}
+function smooth01(t){t=t<0?0:t>1?1:t;return t*t*(3-2*t)}
+const SRGB_TO_LIN=(()=>{const t=new Float32Array(256);for(let i=0;i<256;i++){const c=i/255;t[i]=c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4)}return t})();
+const LIN_TO_SRGB=(()=>{const t=new Float32Array(LIN_N+2);for(let i=0;i<=LIN_N;i++){const c=i/LIN_N;t[i]=c<=.0031308?c*12.92:1.055*Math.pow(c,1/2.4)-.055}t[LIN_N+1]=1;return t})();
+function toSrgb(v){if(v<=0)return 0;if(v>=1)return 1;const f=v*LIN_N,i=f|0;return LIN_TO_SRGB[i]+(LIN_TO_SRGB[i+1]-LIN_TO_SRGB[i])*(f-i)}
+function makeLut(fn){const t=new Float32Array(LUT_N+2);for(let i=0;i<=LUT_N;i++)t[i]=fn(i/LUT_N);t[LUT_N+1]=t[LUT_N];return t}
+function lutAt(t,v){if(v<=0)return t[0];if(v>=1)return t[LUT_N];const f=v*LUT_N,i=f|0;return t[i]+(t[i+1]-t[i])*(f-i)}
+function hash2(x,y){let z=(Math.imul(x,374761393)+Math.imul(y,668265263)+13579)|0;z=Math.imul(z^(z>>>13),1274126177);return((z^(z>>>16))>>>0)/4294967295}
+/* 範囲（円）の効き方。P.fw/P.fhは画像全体の大きさ、P.ox/P.oyはこのバッファの位置 */
+function makeMask(scope,P){if(!scope||scope.mode!=='local')return null;const r=Math.min(P.fw,P.fh)*scope.radius;return{x:scope.x*P.fw-P.ox,y:scope.y*P.fh-P.oy,r0:r*.72,rw:r*.38||1}}
+function maskAt(m,x,y){if(!m)return 1;return 1-smooth01((Math.hypot(x-m.x,y-m.y)-m.r0)/m.rw)}
+/* トーンカーブ：行き過ぎ（オーバーシュート）しない滑らかな曲線 */
+function curveFunction(pts){
+  const n=pts.length,xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+  if(n===1)return()=>ys[0];
+  const d=[],m=new Array(n);for(let i=0;i<n-1;i++)d.push((ys[i+1]-ys[i])/Math.max(1e-6,xs[i+1]-xs[i]));
+  m[0]=d[0];m[n-1]=d[n-2];for(let i=1;i<n-1;i++)m[i]=d[i-1]*d[i]<=0?0:(d[i-1]+d[i])/2;
+  for(let i=0;i<n-1;i++){if(d[i]===0){m[i]=m[i+1]=0;continue}const a=m[i]/d[i],b=m[i+1]/d[i],s=a*a+b*b;if(s>9){const t=3/Math.sqrt(s);m[i]=t*a*d[i];m[i+1]=t*b*d[i]}}
+  return x=>{if(x<=xs[0])return ys[0];if(x>=xs[n-1])return ys[n-1];let i=0;while(i<n-2&&x>xs[i+1])i++;const h=xs[i+1]-xs[i],t=(x-xs[i])/h,t2=t*t,t3=t2*t;
+    return clamp01((2*t3-3*t2+1)*ys[i]+(t3-2*t2+t)*h*m[i]+(-2*t3+3*t2)*ys[i+1]+(t3-t2)*h*m[i+1])};
+}
+function isIdentityCurve(p){return p.length===2&&p[0][0]===0&&p[0][1]===0&&p[1][0]===1&&p[1][1]===1}
+function curvesIdentity(c){return['rgb','r','g','b'].every(k=>isIdentityCurve(c[k]))}
+function toneIsIdentity(v,c){return v.brightness===0&&v.contrast===100&&v.highlights===0&&v.shadows===0&&v.saturation===100&&v.temperature===0&&curvesIdentity(c)}
+/* 色合いを保ったまま0〜1に収める（白とび・色の破綻を防ぐ） */
+const FIT=new Float64Array(3);
+function fitRange(r,g,b){let Y=.2126*r+.7152*g+.0722*b;Y=Y<0?0:Y>1?1:Y;const mx=r>g?(r>b?r:b):(g>b?g:b),mn=r<g?(r<b?r:b):(g<b?g:b);let t=1;if(mx>1&&mx>Y)t=Math.min(t,(1-Y)/(mx-Y));if(mn<0&&mn<Y)t=Math.min(t,Y/(Y-mn));FIT[0]=Y+(r-Y)*t;FIT[1]=Y+(g-Y)*t;FIT[2]=Y+(b-Y)*t}
+/* 1. 色と明るさ */
+function toneStage(p,w,h,P){
+  const v=P.v,S=P.scopes;if(toneIsIdentity(v,P.curves))return;
+  const useLin=v.temperature!==0||v.brightness!==0;
+  const mT=makeMask(S.temperature,P),mE=makeMask(S.brightness,P),mH=makeMask(S.highlights,P),mS=makeMask(S.shadows,P),mC=makeMask(S.contrast,P),mSat=makeMask(S.saturation,P);
+  const kT=v.temperature/100,ev=v.brightness,gFull=Math.pow(2,ev);
+  const hiA=v.highlights/100,shA=v.shadows/100;
+  const hiLut=v.highlights?makeLut(t=>t+hiA*(hiA>0?1:2.2)*t*t*(1-t)):null;
+  const shLut=v.shadows?makeLut(t=>t+shA*(shA>0?2.2:1)*t*(1-t)*(1-t)):null;
+  const cp=Math.max(.05,v.contrast/100);
+  const conLut=v.contrast!==100?makeLut(t=>t<.5?.5*Math.pow(2*t,cp):1-.5*Math.pow(2-2*t,cp)):null;
+  let curR=null,curG=null,curB=null;
+  if(!curvesIdentity(P.curves)){const fm=curveFunction(P.curves.rgb),fr=curveFunction(P.curves.r),fg=curveFunction(P.curves.g),fb=curveFunction(P.curves.b);curR=makeLut(t=>fr(fm(t)));curG=makeLut(t=>fg(fm(t)));curB=makeLut(t=>fb(fm(t)))}
+  let LR=null,LG=null,LB=null;
+  if(useLin&&!mT&&!mE){LR=new Float32Array(256);LG=new Float32Array(256);LB=new Float32Array(256);const wr=1+.22*kT,wb=1-.30*kT,wg=(1-.2126*wr-.0722*wb)/.7152,a=gFull-1;
+    const ex=c=>gFull>=1?c*gFull/(1+c*a):c*gFull;for(let i=0;i<256;i++){const l=SRGB_TO_LIN[i];LR[i]=ex(l*wr);LG[i]=ex(l*wg);LB[i]=ex(l*wb)}}
+  const sat=v.saturation/100;let seed=(P.ox*7919+P.oy*104729+12345)>>>0;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const i=(y*w+x)*4;let r,g,b;
+    if(LR){fitRange(LR[p[i]],LG[p[i+1]],LB[p[i+2]]);r=toSrgb(FIT[0]);g=toSrgb(FIT[1]);b=toSrgb(FIT[2])}
+    else if(useLin){
+      r=SRGB_TO_LIN[p[i]];g=SRGB_TO_LIN[p[i+1]];b=SRGB_TO_LIN[p[i+2]];
+      if(kT){const k=kT*(mT?maskAt(mT,x,y):1);if(k){const wr=1+.22*k,wb=1-.30*k,wg=(1-.2126*wr-.0722*wb)/.7152;r*=wr;g*=wg;b*=wb}}
+      if(ev){const gn=mE?Math.pow(2,ev*maskAt(mE,x,y)):gFull;if(gn>=1){const a=gn-1;r=r*gn/(1+r*a);g=g*gn/(1+g*a);b=b*gn/(1+b*a)}else{r*=gn;g*=gn;b*=gn}}
+      fitRange(r,g,b);r=toSrgb(FIT[0]);g=toSrgb(FIT[1]);b=toSrgb(FIT[2]);
+    }else{r=p[i]/255;g=p[i+1]/255;b=p[i+2]/255}
+    if(hiLut||shLut){const Y0=.2126*r+.7152*g+.0722*b;let Y=Y0;
+      if(hiLut){const m=mH?maskAt(mH,x,y):1;if(m)Y+=(lutAt(hiLut,Y)-Y)*m}
+      if(shLut){const m=mS?maskAt(mS,x,y):1;if(m)Y+=(lutAt(shLut,Y)-Y)*m}
+      if(Y0>1e-5){const f=Y/Y0;r*=f;g*=f;b*=f}else r=g=b=Y;
+      fitRange(r,g,b);r=FIT[0];g=FIT[1];b=FIT[2];
+    }
+    if(conLut){const m=mC?maskAt(mC,x,y):1;if(m){r+=(lutAt(conLut,r)-r)*m;g+=(lutAt(conLut,g)-g)*m;b+=(lutAt(conLut,b)-b)*m}}
+    if(curR){r=lutAt(curR,r);g=lutAt(curG,g);b=lutAt(curB,b)}
+    if(sat!==1){const m=mSat?maskAt(mSat,x,y):1;if(m){const s=1+(sat-1)*m,Y=.2126*r+.7152*g+.0722*b;r=Y+(r-Y)*s;g=Y+(g-Y)*s;b=Y+(b-Y)*s}}
+    fitRange(r,g,b);
+    seed=(Math.imul(seed,1664525)+1013904223)>>>0;const d=seed/4294967296-.5;
+    p[i]=FIT[0]*255+d;p[i+1]=FIT[1]*255+d;p[i+2]=FIT[2]*255+d;
+  }
+}
+/* 2. ブラシ（ソフトライト） */
+function softLight(B,s){return s<=.5?B-(1-2*s)*B*(1-B):B+(2*s-1)*((B<=.25?((16*B-12)*B+4)*B:Math.sqrt(B))-B)}
+function paintStage(p,w,h,P,paint){
+  const op=P.v.paintOpacity/100;if(!paint||op<=0)return;
+  const pd=paint.data,pw=paint.w,ph=paint.h,sx=pw/P.fw,sy=ph/P.fh;
+  for(let y=0;y<h;y++){let fy=(y+P.oy+.5)*sy-.5;fy=fy<0?0:fy>ph-1?ph-1:fy;const y0=fy|0,y1=y0+1<ph?y0+1:y0,ty=fy-y0;
+    for(let x=0;x<w;x++){let fx=(x+P.ox+.5)*sx-.5;fx=fx<0?0:fx>pw-1?pw-1:fx;const x0=fx|0,x1=x0+1<pw?x0+1:x0,tx=fx-x0;
+      const i00=(y0*pw+x0)*4,i01=(y0*pw+x1)*4,i10=(y1*pw+x0)*4,i11=(y1*pw+x1)*4;
+      const a00=pd[i00+3]*(1-tx)*(1-ty),a01=pd[i01+3]*tx*(1-ty),a10=pd[i10+3]*(1-tx)*ty,a11=pd[i11+3]*tx*ty,A=a00+a01+a10+a11;
+      if(A<.5)continue;const alpha=A/255*op,i=(y*w+x)*4;
+      for(let c=0;c<3;c++){const s=(pd[i00+c]*a00+pd[i01+c]*a01+pd[i10+c]*a10+pd[i11+c]*a11)/A/255,B=p[i+c]/255;p[i+c]=(B+(softLight(B,s)-B)*alpha)*255}
+    }}
+}
+/* ぼかし（小さい半径は正確なガウス、大きい半径は高速な箱ぼかし3回） */
+function gaussKernel(s){const r=Math.max(1,Math.ceil(s*3)),k=new Float32Array(2*r+1);let t=0;for(let i=-r;i<=r;i++){const v=Math.exp(-i*i/(2*s*s));k[i+r]=v;t+=v}for(let i=0;i<k.length;i++)k[i]/=t;return k}
+function boxRadii(s,n){const wI=Math.sqrt(12*s*s/n+1);let wl=Math.floor(wI);if(wl%2===0)wl--;const wu=wl+2,m=Math.round((12*s*s-n*wl*wl-4*n*wl-3*n)/(-4*wl-4)),out=[];for(let i=0;i<n;i++)out.push(((i<m?wl:wu)-1)/2);return out}
+function filterLine(line,out,len,nc,op){
+  if(op.k){const k=op.k,kl=k.length,r=(kl-1)>>1;
+    for(let c=0;c<nc;c++)for(let x=0;x<len;x++){let s=0;
+      if(x>=r&&x<len-r){for(let t=0,o=(x-r)*nc+c;t<kl;t++,o+=nc)s+=line[o]*k[t]}
+      else for(let t=-r;t<=r;t++){let xx=x+t;xx=xx<0?0:xx>=len?len-1:xx;s+=line[xx*nc+c]*k[t+r]}
+      out[x*nc+c]=s}
+    return}
+  const r=op.r;if(r<=0){out.set(line.subarray(0,len*nc));return}const inv=1/(2*r+1);
+  for(let c=0;c<nc;c++){let acc=0;for(let t=-r;t<=r;t++){const xx=t<0?0:t>=len?len-1:t;acc+=line[xx*nc+c]}
+    for(let x=0;x<len;x++){out[x*nc+c]=acc*inv;const ad=x+r+1<len?x+r+1:len-1,sb=x-r>0?x-r:0;acc+=line[ad*nc+c]-line[sb*nc+c]}}
+}
+function blurBuffer(buf,w,h,ch,nc,sigma){
+  if(!(sigma>=.3))return;const len=Math.max(w,h),line=new Float32Array(len*nc),out=new Float32Array(len*nc);
+  const ops=sigma<3?[{k:gaussKernel(sigma)}]:boxRadii(sigma,3).map(r=>({r}));
+  for(const op of ops){
+    for(let y=0;y<h;y++){const base=y*w*ch;for(let x=0;x<w;x++)for(let c=0;c<nc;c++)line[x*nc+c]=buf[base+x*ch+c];filterLine(line,out,w,nc,op);for(let x=0;x<w;x++)for(let c=0;c<nc;c++)buf[base+x*ch+c]=out[x*nc+c]}
+    for(let x=0;x<w;x++){for(let y=0;y<h;y++)for(let c=0;c<nc;c++)line[y*nc+c]=buf[(y*w+x)*ch+c];filterLine(line,out,h,nc,op);for(let y=0;y<h;y++)for(let c=0;c<nc;c++)buf[(y*w+x)*ch+c]=out[y*nc+c]}
+  }
+}
+/* 3. 光のにじみ：画像全体を小さな格子にまとめてから計算（画面と保存で同じ見た目になる） */
+function glowGrid(p,w,h,P){
+  const v=P.v,f=Math.min(1,640/Math.max(w,h)),gw=Math.max(1,Math.round(w*f)),gh=Math.max(1,Math.round(h*f));
+  const acc=new Float32Array(gw*gh*3),cnt=new Float32Array(gw*gh),th=v.glowThreshold/100,span=Math.max(.02,1-th);
+  const col=new Int32Array(w);for(let x=0;x<w;x++)col[x]=Math.min(gw-1,Math.floor(x*gw/w));const th255=th*255;
+  for(let y=0;y<h;y++){const row=Math.min(gh-1,Math.floor(y*gh/h))*gw;for(let x=0;x<w;x++){const j=row+col[x],i=(y*w+x)*4;cnt[j]++;
+    const Y255=.2126*p[i]+.7152*p[i+1]+.0722*p[i+2];if(Y255<=th255)continue;const Y=Y255/255;const k=smooth01((Y-th)/span)*p[i+3]/255;acc[j*3]+=SRGB_TO_LIN[p[i]]*k;acc[j*3+1]+=SRGB_TO_LIN[p[i+1]]*k;acc[j*3+2]+=SRGB_TO_LIN[p[i+2]]*k}}
+  for(let j=0;j<cnt.length;j++)if(cnt[j]){acc[j*3]/=cnt[j];acc[j*3+1]/=cnt[j];acc[j*3+2]/=cnt[j]}
+  const sig=1+v.glowRadius/100*40,wide=new Float32Array(acc);blurBuffer(wide,gw,gh,3,3,sig);blurBuffer(acc,gw,gh,3,3,Math.max(.8,sig*.2));
+  for(let k=0;k<wide.length;k++)wide[k]=wide[k]*.65+acc[k]*.35;return{data:wide,gw,gh};
+}
+function glowApply(p,w,h,P,G){
+  const amt=P.v.glow/100*2.5;if(!G||amt<=0)return;const mk=makeMask(P.scopes.glow,P),gd=G.data,gw=G.gw,gh=G.gh,sx=gw/P.fw,sy=gh/P.fh;
+  for(let y=0;y<h;y++){let fy=(y+P.oy+.5)*sy-.5;fy=fy<0?0:fy>gh-1?gh-1:fy;const y0=fy|0,y1=y0+1<gh?y0+1:y0,ty=fy-y0;
+    for(let x=0;x<w;x++){const m=mk?maskAt(mk,x,y):1;if(m<=0)continue;let fx=(x+P.ox+.5)*sx-.5;fx=fx<0?0:fx>gw-1?gw-1:fx;const x0=fx|0,x1=x0+1<gw?x0+1:x0,tx=fx-x0;
+      const j00=(y0*gw+x0)*3,j01=(y0*gw+x1)*3,j10=(y1*gw+x0)*3,j11=(y1*gw+x1)*3,w00=(1-tx)*(1-ty),w01=tx*(1-ty),w10=(1-tx)*ty,w11=tx*ty,k=amt*m,i=(y*w+x)*4;
+      for(let c=0;c<3;c++){const gv=(gd[j00+c]*w00+gd[j01+c]*w01+gd[j10+c]*w10+gd[j11+c]*w11)*k;if(gv<1e-5)continue;const B=SRGB_TO_LIN[p[i+c]];p[i+c]=toSrgb(B+(1-B)*Math.min(1,gv))*255}
+    }}
+}
+/* 4. ぼかし（範囲指定時は円の外側をぼかす） */
+function blurStage(p,w,h,P){
+  const amt=P.v.blur;if(amt<=0)return;const q=new Uint8ClampedArray(p);blurBuffer(q,w,h,4,3,Math.max(.5,amt*P.scale));
+  const mk=makeMask(P.scopes.blur,P);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const m=mk?1-maskAt(mk,x,y):1;if(m<=0)continue;const i=(y*w+x)*4;for(let c=0;c<3;c++)p[i+c]=p[i+c]+(q[i+c]-p[i+c])*m}
+}
+/* 5. シャープ（明るさだけにかけて色のにじみを防ぐ） */
+function sharpenStage(p,w,h,P){
+  const amt=P.v.sharpness;if(amt<=0)return;const n=w*h,L=new Float32Array(n);for(let j=0;j<n;j++){const i=j*4;L[j]=.2126*p[i]+.7152*p[i+1]+.0722*p[i+2]}
+  const Bl=new Float32Array(L);blurBuffer(Bl,w,h,1,1,Math.max(.6,1.2*P.scale));const k=amt/45,mk=makeMask(P.scopes.sharpness,P);
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const m=mk?maskAt(mk,x,y):1;if(m<=0)continue;const j=y*w+x,i=j*4,d=(L[j]-Bl[j])*k*m;p[i]+=d;p[i+1]+=d;p[i+2]+=d}
+}
+/* 6. 周辺減光と粒状感（ノイズは必ず最後） */
+function finalStage(p,w,h,P){
+  const v=P.v,vig=v.vignette/100,G=v.grain;if(!vig&&!G)return;
+  const mk=makeMask(P.scopes.grain,P);let cell=v.size*P.scale,amp=G*1.4;if(cell<1){amp*=cell;cell=1}
+  const hw=P.fw/2,hh=P.fh/2;
+  for(let y=0;y<h;y++){const dy=(y+P.oy-hh)/hh,cy=Math.floor((y+P.oy)/cell);
+    for(let x=0;x<w;x++){const i=(y*w+x)*4;let f=1,n=0;
+      if(vig){const dx=(x+P.ox-hw)/hw;f=1-vig*Math.min(1,(dx*dx+dy*dy)/2)}
+      if(G){const m=mk?maskAt(mk,x,y):1;if(m>0){const cx=Math.floor((x+P.ox)/cell);n=(hash2(cx,cy)+hash2(cx+7919,cy+104729)-1)*amp*m}}
+      p[i]=p[i]*f+n;p[i+1]=p[i+1]*f+n;p[i+2]=p[i+2]*f+n;
+    }}
+}
+function renderPhoto(p,w,h,P,paint,progress){
+  progress=progress||function(){};
+  toneStage(p,w,h,P);progress(.35);paintStage(p,w,h,P,paint);progress(.45);
+  if(P.v.glow>0)glowApply(p,w,h,P,glowGrid(p,w,h,P));progress(.6);
+  blurStage(p,w,h,P);progress(.75);sharpenStage(p,w,h,P);progress(.9);finalStage(p,w,h,P);progress(1);
+}
+</script>
 <script>
-const file=document.getElementById('file'),save=document.getElementById('save'),compare=document.getElementById('compare');
-const saveFormat=document.getElementById('saveFormat');
-const info=document.getElementById('info'),message=document.getElementById('message'),preview=document.getElementById('preview'),main=document.querySelector('main');
-const photoControls=document.getElementById('photoControls'),textureControls=document.getElementById('textureControls');
-const effectIds=['brightness','contrast','highlights','shadows','saturation','temperature','vignette','blur','grain','sharpness'];
-const names={brightness:'明るさ',contrast:'コントラスト',highlights:'明るい部分',shadows:'暗い部分',saturation:'彩度',temperature:'色温度',vignette:'周辺減光',blur:'ぼかし',grain:'粒状感',sharpness:'シャープ'};
-const states=Object.fromEntries(effectIds.map(id=>[id,{mode:'global',x:.5,y:.5,radius:35}]));
-let source=null,filename='仕上げ',timer=0,activeEffect='brightness',compareMode=false,appMode='photo',activeMap='normal';
-function clamp(v){return Math.max(0,Math.min(255,v))}
-function smooth(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)}
-function mask(id,x,y,w,h){const s=states[id];if(s.mode==='global')return 1;const r=Math.min(w,h)*s.radius/100,d=Math.hypot(x-s.x*w,y-s.y*h);return 1-smooth((d-r*.72)/(r*.38||1))}
-function hash(x,y){let z=(Math.imul(x,374761393)+Math.imul(y,668265263)+13579)|0;z=Math.imul(z^(z>>>13),1274126177);return((z^(z>>>16))>>>0)/4294967295}
+"use strict";
+const $=id=>document.getElementById(id);
+const file=$('file'),save=$('save'),compare=$('compare'),saveFormat=$('saveFormat'),saveDpi=$('saveDpi'),loupeBtn=$('loupeBtn');
+const info=$('info'),message=$('message'),preview=$('preview'),overlay=$('overlay'),stage=$('stage'),loupe=$('loupe'),main=document.querySelector('main');
+const undoBtn=$('undo'),redoBtn=$('redo'),resetAllBtn=$('resetAll');
+const photoControls=$('photoControls'),textureControls=$('textureControls');
+const PARAM_IDS=['brightness','contrast','highlights','shadows','saturation','temperature','vignette','blur','grain','size','sharpness','glow','glowRadius','glowThreshold','paintOpacity'];
+const PRESET_IDS=PARAM_IDS.filter(id=>id!=='paintOpacity');
+const SCOPE_IDS=['brightness','contrast','highlights','shadows','saturation','temperature','vignette','blur','grain','sharpness','glow'];
+const SCOPED_UI=SCOPE_IDS.filter(id=>id!=='vignette');
+const TONE_IDS=['brightness','contrast','highlights','shadows','saturation','temperature'];
+const names={brightness:'明るさ',contrast:'コントラスト',highlights:'明るい部分',shadows:'暗い部分',curve:'トーンカーブ',saturation:'彩度',temperature:'色温度',brush:'ブラシ（ソフトライト）',glow:'光のにじみ',vignette:'周辺減光',blur:'ぼかし',sharpness:'シャープ',grain:'粒状感'};
+const signed=v=>v>0?'+'+v:String(v);
+const FORMAT={brightness:v=>v.toFixed(2)+' EV',contrast:v=>v+'%',highlights:signed,shadows:signed,saturation:v=>v+'%',temperature:v=>v<0?'寒色 '+(-v):v>0?'暖色 '+v:'0',vignette:String,blur:v=>v+' px',grain:String,size:v=>v+' px',sharpness:String,glow:String,glowRadius:String,glowThreshold:v=>v+'%',paintOpacity:v=>v+'%',brushHardness:v=>v+'%',brushFlow:v=>v+'%',
+  brushSize:v=>v+'%'+(source?'（約'+Math.round(v/100*Math.max(source.width,source.height))+'px）':'')};
+const newCurves=()=>({rgb:[[0,0],[1,1]],r:[[0,0],[1,1]],g:[[0,0],[1,1]],b:[[0,0],[1,1]]});
+const cloneCurves=c=>({rgb:c.rgb.map(p=>[p[0],p[1]]),r:c.r.map(p=>[p[0],p[1]]),g:c.g.map(p=>[p[0],p[1]]),b:c.b.map(p=>[p[0],p[1]])});
+const states=Object.fromEntries(SCOPE_IDS.map(id=>[id,{mode:'global',x:.5,y:.5,radius:35}]));
+let curves=newCurves(),curveChannel='rgb';
+let source=null,filename='仕上げ',activeEffect='brightness',compareMode=false,splitPos=.5,appMode='photo',activeMap='normal',loupeOn=false,busy=false;
+let basePreview=null,previewScale=1,imageSerial=0,stageCache=[],lastGlowGrid=null,lastOutput=null,lumHist=null;
+let pointer=null,painting=false,draggingScope=false,draggingSplit=false,lastPaint=null,brushMode='light';
+
 function values(){
-  const v={};effectIds.forEach(id=>v[id]=Number(document.getElementById(id).value));v.size=Number(document.getElementById('size').value);
-  document.getElementById('bv').textContent=v.brightness.toFixed(2)+' EV';document.getElementById('cv').textContent=v.contrast+'%';
-  document.getElementById('hv').textContent=v.highlights>0?'+'+v.highlights:String(v.highlights);document.getElementById('shv').textContent=v.shadows>0?'+'+v.shadows:String(v.shadows);
-  document.getElementById('satv').textContent=v.saturation+'%';document.getElementById('tv').textContent=v.temperature<0?'寒色 '+Math.abs(v.temperature):v.temperature>0?'暖色 '+v.temperature:'0';
-  document.getElementById('vv').textContent=String(v.vignette);document.getElementById('blv').textContent=v.blur+' px';document.getElementById('gv').textContent=String(v.grain);
-  document.getElementById('sv').textContent=v.size+' px';document.getElementById('sharpv').textContent=String(v.sharpness);return v;
+  const v={};for(const id of PARAM_IDS)v[id]=Number($(id).value);
+  document.querySelectorAll('[data-out]').forEach(el=>{const id=el.dataset.out;el.textContent=(FORMAT[id]||String)(Number($(id).value))});
+  updateChangedTabs(v);return v;
 }
+function isDefault(id,v){return v===Number($(id).defaultValue)}
+function updateChangedTabs(v){
+  document.querySelectorAll('.effect-tab').forEach(t=>{const id=t.dataset.effectTab;let ch;
+    if(id==='curve')ch=!curvesIdentity(curves);else if(id==='brush')ch=hasPaint;else if(id==='grain')ch=v.grain!==0;else ch=!isDefault(id,v[id]);
+    t.classList.toggle('changed',ch)});
+}
+function buildParams(w,h,scale,frame){
+  const v=values();
+  return{v,scale,fw:frame?frame.fw:w,fh:frame?frame.fh:h,ox:frame?frame.ox:0,oy:frame?frame.oy:0,curves:cloneCurves(curves),
+    scopes:Object.fromEntries(SCOPE_IDS.map(id=>{const s=states[id];return[id,{mode:id==='vignette'?'global':s.mode,x:s.x,y:s.y,radius:s.radius/100}]}))};
+}
+
+/* ===== ブラシのレイヤー ===== */
+const paintCanvas=document.createElement('canvas'),paintCtx=paintCanvas.getContext('2d',{willReadFrequently:true});
+let paintRev=0,paintSnap=null,paintVersion=0,paintCounter=0,hasPaint=false,paintDataCache=null;paintRev++;
+function setupPaint(){const f=Math.min(1,1600/Math.max(source.width,source.height));paintCanvas.width=Math.max(1,Math.round(source.width*f));paintCanvas.height=Math.max(1,Math.round(source.height*f));paintCtx.clearRect(0,0,paintCanvas.width,paintCanvas.height);paintSnap=null;hasPaint=false;paintVersion=++paintCounter;paintDataCache=null;paintRev++}
+function paintData(){if(!hasPaint)return null;if(!paintDataCache){const d=paintCtx.getImageData(0,0,paintCanvas.width,paintCanvas.height);paintDataCache={data:d.data,w:d.width,h:d.height}}return paintDataCache}
+function imageHasAlpha(img){const d=img.data;for(let i=3;i<d.length;i+=4)if(d[i])return true;return false}
+function hexToRgb(h){const n=parseInt(h.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255]}
+function brushRadius(){return Math.max(1,Number($('brushSize').value)/100*Math.max(paintCanvas.width,paintCanvas.height)/2)}
+function dab(px,py){
+  const r=brushRadius(),hard=Number($('brushHardness').value)/100,flow=Number($('brushFlow').value)/100;
+  const c=brushMode==='light'?[255,255,255]:brushMode==='dark'?[0,0,0]:brushMode==='color'?hexToRgb($('brushColor').value):[0,0,0];
+  const g=paintCtx.createRadialGradient(px,py,0,px,py,r);
+  for(let k=0;k<=8;k++){const t=k/8;g.addColorStop(Math.min(1,hard*.98+(1-hard*.98)*t),'rgba('+c[0]+','+c[1]+','+c[2]+','+(flow*(1-smooth01(t))).toFixed(4)+')')}
+  paintCtx.globalCompositeOperation=brushMode==='erase'?'destination-out':'source-over';paintCtx.fillStyle=g;paintCtx.beginPath();paintCtx.arc(px,py,r,0,Math.PI*2);paintCtx.fill();paintCtx.globalCompositeOperation='source-over';
+  hasPaint=true;paintDataCache=null;paintRev++;
+}
+function strokeTo(nx,ny){const x=nx*paintCanvas.width,y=ny*paintCanvas.height,step=Math.max(1,brushRadius()*.15);const dx=x-lastPaint.x,dy=y-lastPaint.y,dist=Math.hypot(dx,dy);if(dist<step)return;const n=Math.floor(dist/step);for(let k=1;k<=n;k++)dab(lastPaint.x+dx*k/n,lastPaint.y+dy*k/n);lastPaint={x,y}}
+function endStroke(){paintSnap=paintCtx.getImageData(0,0,paintCanvas.width,paintCanvas.height);hasPaint=imageHasAlpha(paintSnap);if(!hasPaint)paintSnap=null;paintDataCache=null;paintRev++;paintVersion=++paintCounter;pushHistory();values()}
+
+/* ===== 元に戻す・やり直す ===== */
+let history=[],hIndex=-1;
+function snapshot(){return{values:Object.fromEntries(PARAM_IDS.map(id=>[id,Number($(id).value)])),scopes:Object.fromEntries(SCOPE_IDS.map(id=>[id,{...states[id]}])),curves:cloneCurves(curves),paint:paintSnap,paintVersion}}
+function pushHistory(){
+  if(!source)return;const s=snapshot(),key=JSON.stringify([s.values,s.scopes,s.curves,s.paintVersion]);
+  if(history[hIndex]&&history[hIndex].key===key)return;
+  history=history.slice(0,hIndex+1);history.push({key,state:s});if(history.length>40)history.shift();hIndex=history.length-1;updateUndo();
+}
+function updateUndo(){const ok=!!source&&appMode==='photo'&&!busy;undoBtn.disabled=!(ok&&hIndex>0);redoBtn.disabled=!(ok&&hIndex<history.length-1);resetAllBtn.disabled=!ok}
+function restoreState(s){
+  for(const id of PARAM_IDS)$(id).value=s.values[id];for(const id of SCOPE_IDS)Object.assign(states[id],s.scopes[id]);curves=cloneCurves(s.curves);
+  if(s.paintVersion!==paintVersion){paintCtx.clearRect(0,0,paintCanvas.width,paintCanvas.height);if(s.paint)paintCtx.putImageData(s.paint,0,0);paintSnap=s.paint;paintVersion=s.paintVersion;hasPaint=!!s.paint;paintDataCache=null;paintRev++}
+  syncScopeUI();values();drawCurve();selectEffect(activeEffect);requestDraw();
+}
+function undo(){if(undoBtn.disabled)return;hIndex--;restoreState(history[hIndex].state);updateUndo();message.textContent='1つ前の状態に戻しました。'}
+function redo(){if(redoBtn.disabled)return;hIndex++;restoreState(history[hIndex].state);updateUndo();message.textContent='やり直しました。'}
+function resetAll(){
+  if(!source||!window.confirm('すべての調整とブラシで塗った内容を初期状態に戻しますか？（「元に戻す」で取り消せます）'))return;
+  for(const id of PARAM_IDS)$(id).value=$(id).defaultValue;for(const id of SCOPE_IDS)Object.assign(states[id],{mode:'global',x:.5,y:.5,radius:35});curves=newCurves();
+  paintCtx.clearRect(0,0,paintCanvas.width,paintCanvas.height);paintSnap=null;hasPaint=false;paintDataCache=null;paintRev++;paintVersion=++paintCounter;
+  syncScopeUI();values();drawCurve();selectEffect(activeEffect);pushHistory();requestDraw();message.textContent='すべて初期状態に戻しました。';
+}
+
+/* ===== 範囲（円） ===== */
 function initScopes(){
-  document.querySelectorAll('.control[data-effect]').forEach(box=>{const id=box.dataset.effect;if(id==='vignette')return;const row=document.createElement('div');row.className='scope-row';
-    row.innerHTML='<button type="button" class="scope active" data-mode="global">全体</button><button type="button" class="scope" data-mode="local">範囲</button>';
+  document.querySelectorAll('.control[data-effect]').forEach(box=>{const id=box.dataset.effect;if(!SCOPED_UI.includes(id))return;
+    const row=document.createElement('div');row.className='scope-row';row.innerHTML='<button type="button" class="scope active" data-mode="global">全体</button><button type="button" class="scope" data-mode="local">範囲</button>';
     const radius=document.createElement('div');radius.className='scope-radius';radius.innerHTML='<label>範囲の広さ <span>35%</span></label><input type="range" min="8" max="100" value="35" step="1">';
-    box.append(row,radius);row.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{states[id].mode=btn.dataset.mode;activeEffect=id;
-      row.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b===btn));box.classList.toggle('local',states[id].mode==='local');selectEffect(id);draw();
-      message.textContent=states[id].mode==='local'?names[id]+'の範囲を編集中。':names[id]+'を画像全体に適用します。';}));
-    radius.querySelector('input').addEventListener('input',e=>{states[id].radius=Number(e.target.value);radius.querySelector('span').textContent=e.target.value+'%';activeEffect=id;selectEffect(id);schedule()});
-    box.addEventListener('pointerdown',()=>{activeEffect=id;selectEffect(id)});
-  });selectEffect(activeEffect);
+    box.append(row,radius);
+    row.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{states[id].mode=btn.dataset.mode;syncScopeUI();selectEffect(id);pushHistory();requestDraw();
+      message.textContent=states[id].mode==='local'?names[id]+'の範囲を編集中。画像の上をクリック・ドラッグして円の中心を動かせます。':names[id]+'を画像全体に適用します。'}));
+    const input=radius.querySelector('input');
+    input.addEventListener('input',()=>{states[id].radius=Number(input.value);radius.querySelector('span').textContent=input.value+'%';requestDraw()});
+    input.addEventListener('change',pushHistory);
+  });
 }
-function selectEffect(id){if(id==='vignette')states.vignette.mode='global';document.querySelectorAll('.effect-tab').forEach(b=>b.classList.toggle('active',b.dataset.effectTab===id));document.querySelectorAll('.control[data-effect]').forEach(b=>{const current=b.dataset.effect===id;b.classList.toggle('current',current);b.classList.toggle('editing',current&&states[id].mode==='local')})}
-const PRESET_KEY='perspective_editor_photo_presets_v1';
-const presetList=document.getElementById('presetList'),presetName=document.getElementById('presetName'),presetStatus=document.getElementById('presetStatus');
-const presetApply=document.getElementById('presetApply'),presetDelete=document.getElementById('presetDelete');
-function presetNotice(text){presetStatus.textContent=text}
-function validatePreset(input){
+function syncScopeUI(){
+  document.querySelectorAll('.control[data-effect]').forEach(box=>{const s=states[box.dataset.effect];if(!s||!SCOPED_UI.includes(box.dataset.effect))return;
+    box.classList.toggle('local',s.mode==='local');box.querySelectorAll('.scope').forEach(b=>b.classList.toggle('active',b.dataset.mode===s.mode));
+    const rad=box.querySelector('.scope-radius');if(rad){rad.querySelector('input').value=s.radius;rad.querySelector('span').textContent=s.radius+'%'}});
+}
+function selectEffect(id){
+  activeEffect=id;document.querySelectorAll('.effect-tab').forEach(b=>b.classList.toggle('active',b.dataset.effectTab===id));
+  document.querySelectorAll('.control[data-effect]').forEach(b=>{const cur=b.dataset.effect===id;b.classList.toggle('current',cur);b.classList.toggle('editing',cur&&!!states[id]&&states[id].mode==='local')});
+  overlay.classList.toggle('brush',id==='brush'&&!compareMode&&appMode==='photo');
+  if(id==='curve')drawCurve();drawOverlay();
+}
+
+/* ===== プリセット ===== */
+const PRESET_KEY='perspective_editor_photo_presets_v2',OLD_PRESET_KEY='perspective_editor_photo_presets_v1';
+const presetList=$('presetList'),presetName=$('presetName'),presetStatus=$('presetStatus'),presetApply=$('presetApply'),presetDelete=$('presetDelete');
+function presetNotice(t){presetStatus.textContent=t}
+function validCurve(c){return Array.isArray(c)&&c.length>=2&&c.length<=16&&c.every(p=>Array.isArray(p)&&p.length===2&&p.every(n=>typeof n==='number'&&Number.isFinite(n)&&n>=0&&n<=1))&&c.every((p,i)=>i===0||p[0]>c[i-1][0])}
+function validatePreset(input,fillDefaults){
   if(!input||typeof input!=='object'||typeof input.name!=='string'||!input.name.trim()||input.name.trim().length>80)throw Error('invalid preset');
-  const clean={name:input.name.trim(),values:{},scopes:{}};
-  for(const id of [...effectIds,'size']){
-    const el=document.getElementById(id),v=input.values?.[id],min=Number(el.min),max=Number(el.max),step=Number(el.step);
-    if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max||Math.abs((v-min)/step-Math.round((v-min)/step))>1e-6)throw Error('invalid value');
-    clean.values[id]=v;
-  }
-  for(const id of effectIds){
-    const s=input.scopes?.[id];
+  const clean={name:input.name.trim(),values:{},scopes:{},curves:newCurves()};
+  for(const id of PRESET_IDS){const el=$(id),min=Number(el.min),max=Number(el.max),step=Number(el.step);let v=input.values?.[id];if(v===undefined&&fillDefaults)v=Number(el.defaultValue);
+    if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max||Math.abs((v-min)/step-Math.round((v-min)/step))>1e-6)throw Error('invalid value');clean.values[id]=v}
+  for(const id of SCOPE_IDS){let s=input.scopes?.[id];if(s===undefined&&fillDefaults)s={mode:'global',x:.5,y:.5,radius:.35};
     if(!s||!['global','local'].includes(s.mode)||!['x','y','radius'].every(k=>typeof s[k]==='number'&&Number.isFinite(s[k]))||s.x<0||s.x>1||s.y<0||s.y>1||s.radius<.08||s.radius>1||Math.abs(s.radius*100-Math.round(s.radius*100))>1e-6)throw Error('invalid scope');
-    clean.scopes[id]={mode:id==='vignette'?'global':s.mode,x:s.x,y:s.y,radius:s.radius};
-  }
+    clean.scopes[id]={mode:id==='vignette'?'global':s.mode,x:s.x,y:s.y,radius:s.radius}}
+  if(input.curves!==undefined||!fillDefaults)for(const k of['rgb','r','g','b']){const c=input.curves?.[k];if(!validCurve(c))throw Error('invalid curve');clean.curves[k]=c.map(p=>[p[0],p[1]])}
   return clean;
 }
+function parseStore(raw,version,fill){const data=JSON.parse(raw);if(data?.version!==version||!Array.isArray(data.presets))throw Error('invalid format');const items=data.presets.map(p=>validatePreset(p,fill));if(new Set(items.map(p=>p.name)).size!==items.length)throw Error('duplicate names');return items}
 function readPresets(){
-  let raw;
-  try{raw=localStorage.getItem(PRESET_KEY)}catch(e){presetNotice('ブラウザの保存領域を利用できません。写真調整はそのまま使えます。');return null}
-  if(raw===null)return [];
-  try{
-    const data=JSON.parse(raw);
-    if(data?.version!==1||!Array.isArray(data.presets))throw Error('invalid format');
-    const items=data.presets.map(validatePreset);
-    if(new Set(items.map(p=>p.name)).size!==items.length)throw Error('duplicate names');
-    return items;
-  }catch(e){presetNotice('プリセットの保存データを読み込めません。既存データの保護のため保存・適用を中止しました。');return null}
+  let raw,old;try{raw=localStorage.getItem(PRESET_KEY);old=raw===null?localStorage.getItem(OLD_PRESET_KEY):null}catch(e){presetNotice('ブラウザの保存領域を利用できません。写真調整はそのまま使えます。');return null}
+  if(raw!==null){try{return parseStore(raw,2,false)}catch(e){presetNotice('プリセットの保存データを読み込めません。既存データの保護のため保存・適用を中止しました。');return null}}
+  if(old!==null){try{return parseStore(old,1,true)}catch(e){presetNotice('以前のプリセットを読み込めませんでした（以前のデータは消さずに残しています）。');return[]}}
+  return[];
 }
-function writePresets(items){
-  try{localStorage.setItem(PRESET_KEY,JSON.stringify({version:1,presets:items}));return true}
-  catch(e){presetNotice('保存できませんでした。ブラウザの保存許可や空き容量をご確認ください。');return false}
-}
-function refreshPresets(items,selected=presetList.value){
-  presetList.replaceChildren(new Option('プリセットを選択',''));
-  for(const p of items)presetList.add(new Option(p.name,p.name));
-  presetList.value=items.some(p=>p.name===selected)?selected:'';
-  presetApply.disabled=presetDelete.disabled=!presetList.value;
-}
-function capturePreset(name){
-  return validatePreset({name,values:values(),scopes:Object.fromEntries(effectIds.map(id=>[id,{mode:states[id].mode,x:states[id].x,y:states[id].y,radius:states[id].radius/100}]))});
-}
+function writePresets(items){try{localStorage.setItem(PRESET_KEY,JSON.stringify({version:2,presets:items}));return true}catch(e){presetNotice('保存できませんでした。ブラウザの保存許可や空き容量をご確認ください。');return false}}
+function refreshPresets(items,selected=presetList.value){presetList.replaceChildren(new Option('プリセットを選択',''));for(const p of items)presetList.add(new Option(p.name,p.name));presetList.value=items.some(p=>p.name===selected)?selected:'';presetApply.disabled=presetDelete.disabled=!presetList.value}
+function capturePreset(name){return validatePreset({name,values:Object.fromEntries(PRESET_IDS.map(id=>[id,Number($(id).value)])),scopes:Object.fromEntries(SCOPE_IDS.map(id=>[id,{mode:states[id].mode,x:states[id].x,y:states[id].y,radius:states[id].radius/100}])),curves:cloneCurves(curves)},false)}
 function savePhotoPreset(){
-  if(appMode!=='photo')return;
-  const name=presetName.value.trim();
-  if(!name||name.length>80){presetNotice('名前を1〜80文字で入力してください。');presetName.focus();return}
-  const items=readPresets();if(!items)return;
-  const index=items.findIndex(p=>p.name===name);
+  if(appMode!=='photo')return;const name=presetName.value.trim();if(!name||name.length>80){presetNotice('名前を1〜80文字で入力してください。');presetName.focus();return}
+  const items=readPresets();if(!items)return;const index=items.findIndex(p=>p.name===name);
   if(index!==-1&&!window.confirm('「'+name+'」を現在の調整で上書きしますか？')){presetNotice('上書きを取り消しました。');return}
   let next;try{next=capturePreset(name)}catch(e){presetNotice('調整値を保存できませんでした。値と範囲をご確認ください。');return}
-  if(index===-1)items.push(next);else items[index]=next;
-  if(!writePresets(items))return;
-  refreshPresets(items,name);presetName.value=name;presetNotice('「'+name+'」を保存しました。');
+  if(index===-1)items.push(next);else items[index]=next;if(!writePresets(items))return;refreshPresets(items,name);presetName.value=name;presetNotice('「'+name+'」を保存しました。');
 }
 function applyPhotoPreset(){
-  if(appMode!=='photo')return;
-  const items=readPresets();if(!items)return;
-  const selected=items.find(p=>p.name===presetList.value);
-  if(!selected){refreshPresets(items);presetNotice('適用するプリセットを選んでください。');return}
-  for(const id of [...effectIds,'size'])document.getElementById(id).value=selected.values[id];
-  for(const id of effectIds){
-    const s=selected.scopes[id];Object.assign(states[id],{mode:id==='vignette'?'global':s.mode,x:s.x,y:s.y,radius:Math.round(s.radius*100)});
-  }
-  document.querySelectorAll('.control[data-effect]').forEach(box=>{
-    const s=states[box.dataset.effect];box.classList.toggle('local',s.mode==='local');
-    box.querySelectorAll('.scope').forEach(button=>button.classList.toggle('active',button.dataset.mode===s.mode));
-    const radius=box.querySelector('.scope-radius');if(radius){radius.querySelector('input').value=s.radius;radius.querySelector('span').textContent=s.radius+'%'}
-  });
-  compareMode=false;compare.textContent='元画像と比較';clearTimeout(timer);values();selectEffect(activeEffect);draw();
-  presetName.value=selected.name;presetNotice('「'+selected.name+'」を適用しました。範囲の位置は画像に合わせて調整できます。');
+  if(appMode!=='photo')return;const items=readPresets();if(!items)return;const sel=items.find(p=>p.name===presetList.value);
+  if(!sel){refreshPresets(items);presetNotice('適用するプリセットを選んでください。');return}
+  for(const id of PRESET_IDS)$(id).value=sel.values[id];
+  for(const id of SCOPE_IDS){const s=sel.scopes[id];Object.assign(states[id],{mode:id==='vignette'?'global':s.mode,x:s.x,y:s.y,radius:Math.round(s.radius*100)})}
+  curves=cloneCurves(sel.curves);syncScopeUI();values();drawCurve();selectEffect(activeEffect);pushHistory();requestDraw();
+  presetName.value=sel.name;presetNotice('「'+sel.name+'」を適用しました。範囲の位置は画像に合わせて調整できます。');
 }
 function deletePhotoPreset(){
-  if(appMode!=='photo')return;
-  const items=readPresets();if(!items)return;
-  const name=presetList.value;if(!items.some(p=>p.name===name)){refreshPresets(items);return}
+  if(appMode!=='photo')return;const items=readPresets();if(!items)return;const name=presetList.value;if(!items.some(p=>p.name===name)){refreshPresets(items);return}
   if(!window.confirm('プリセット「'+name+'」を削除しますか？')){presetNotice('削除を取り消しました。');return}
-  const remaining=items.filter(p=>p.name!==name);if(!writePresets(remaining))return;
-  refreshPresets(remaining,'');if(presetName.value===name)presetName.value='';presetNotice('「'+name+'」を削除しました。');
+  const rest=items.filter(p=>p.name!==name);if(!writePresets(rest))return;refreshPresets(rest,'');if(presetName.value===name)presetName.value='';presetNotice('「'+name+'」を削除しました。');
 }
 function initPresets(){
-  const items=readPresets();refreshPresets(items||[]);
-  document.getElementById('presetSave').addEventListener('click',savePhotoPreset);
-  presetApply.addEventListener('click',applyPhotoPreset);presetDelete.addEventListener('click',deletePhotoPreset);
+  refreshPresets(readPresets()||[]);$('presetSave').addEventListener('click',savePhotoPreset);presetApply.addEventListener('click',applyPhotoPreset);presetDelete.addEventListener('click',deletePhotoPreset);
   presetList.addEventListener('change',()=>{presetApply.disabled=presetDelete.disabled=!presetList.value;if(presetList.value)presetName.value=presetList.value});
-  presetName.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing){event.preventDefault();savePhotoPreset()}});
-  window.addEventListener('storage',event=>{if(event.key===PRESET_KEY||event.key===null){const items=readPresets();refreshPresets(items||[])}});
+  presetName.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing){e.preventDefault();savePhotoPreset()}});
+  window.addEventListener('storage',e=>{if(e.key===PRESET_KEY||e.key===null)refreshPresets(readPresets()||[])});
 }
-function applyTone(canvas,v){const ctx=canvas.getContext('2d',{willReadFrequently:true}),frame=ctx.getImageData(0,0,canvas.width,canvas.height),p=frame.data,w=canvas.width,h=canvas.height;
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4,r=p[i],g=p[i+1],b=p[i+2],gray=r*.2126+g*.7152+b*.0722,lit=gray/255;let rgb=[r,g,b];
-    let m=mask('saturation',x,y,w,h),sat=1+(v.saturation/100-1)*m;rgb=rgb.map(c=>gray+(c-gray)*sat);
-    m=mask('brightness',x,y,w,h);const exposure=Math.pow(2,v.brightness*m);rgb=rgb.map(c=>c*exposure);
-    m=mask('contrast',x,y,w,h);const con=1+(v.contrast/100-1)*m;rgb=rgb.map(c=>(c-128)*con+128);
-    m=mask('highlights',x,y,w,h);const hi=v.highlights*lit*lit*.8*m;rgb=rgb.map(c=>c+hi);
-    m=mask('shadows',x,y,w,h);const sh=v.shadows*(1-lit)*(1-lit)*.8*m;rgb=rgb.map(c=>c+sh);
-    m=mask('temperature',x,y,w,h);rgb[0]+=v.temperature*.28*m;rgb[2]-=v.temperature*.32*m;
-    m=mask('vignette',x,y,w,h);const dx=(x-w/2)/(w/2),dy=(y-h/2)/(h/2),edge=Math.min(1,(dx*dx+dy*dy)/2),vig=1-v.vignette/100*edge*m;rgb=rgb.map(c=>c*vig);
-    m=mask('grain',x,y,w,h);const noise=v.grain?(hash(Math.floor(x/v.size),Math.floor(y/v.size))*2-1)*v.grain*m:0;
-    p[i]=clamp(rgb[0]+noise);p[i+1]=clamp(rgb[1]+noise);p[i+2]=clamp(rgb[2]+noise);
-  }ctx.putImageData(frame,0,0);
+
+/* ===== トーンカーブ ===== */
+const curveCanvas=$('curveCanvas');let curveDrag=null;
+const CURVE_COLORS={rgb:'#f2f2f2',r:'#ff6b6b',g:'#6bdc7b',b:'#6aa8ff'};
+function drawCurve(){
+  const c=curveCanvas.getContext('2d'),W=curveCanvas.width,H=curveCanvas.height;c.clearRect(0,0,W,H);
+  if(lumHist){let mx=1;for(let i=2;i<254;i++)mx=Math.max(mx,lumHist[i]);c.fillStyle='rgba(255,255,255,.12)';c.beginPath();c.moveTo(0,H);for(let i=0;i<256;i++)c.lineTo(i/255*W,H-Math.min(1,lumHist[i]/mx)*H*.9);c.lineTo(W,H);c.fill()}
+  c.strokeStyle='rgba(255,255,255,.12)';c.lineWidth=1;for(let k=1;k<4;k++){c.beginPath();c.moveTo(k*W/4,0);c.lineTo(k*W/4,H);c.moveTo(0,k*H/4);c.lineTo(W,k*H/4);c.stroke()}
+  c.setLineDash([6,6]);c.beginPath();c.moveTo(0,H);c.lineTo(W,0);c.stroke();c.setLineDash([]);
+  for(const ch of['r','g','b','rgb']){if(ch===curveChannel||isIdentityCurve(curves[ch]))continue;drawCurveLine(c,ch,.35,2)}
+  drawCurveLine(c,curveChannel,1,3);
+  c.fillStyle='#1b1b1b';c.strokeStyle=CURVE_COLORS[curveChannel];c.lineWidth=2.5;for(const p of curves[curveChannel]){c.beginPath();c.rect(p[0]*W-7,(1-p[1])*H-7,14,14);c.fill();c.stroke()}
 }
-function applyFiltered(canvas,id,amount,scale){if(amount<=0)return;const w=canvas.width,h=canvas.height,tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;const tc=tmp.getContext('2d');
-  tc.filter='blur('+(id==='blur'?Math.max(1,amount*scale):Math.max(.7,1.2*scale))+'px)';tc.drawImage(canvas,0,0);const ctx=canvas.getContext('2d',{willReadFrequently:true}),base=ctx.getImageData(0,0,w,h),soft=tc.getImageData(0,0,w,h),a=base.data,b=soft.data;
-  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4,area=mask(id,x,y,w,h),m=id==='blur'&&states.blur.mode==='local'?1-area:area;for(let k=0;k<3;k++)a[i+k]=id==='blur'?a[i+k]*(1-m)+b[i+k]*m:clamp(a[i+k]+(a[i+k]-b[i+k])*(amount/45)*m)}ctx.putImageData(base,0,0);
+function drawCurveLine(c,ch,alpha,width){const W=curveCanvas.width,H=curveCanvas.height,f=curveFunction(curves[ch]);c.globalAlpha=alpha;c.strokeStyle=CURVE_COLORS[ch];c.lineWidth=width;c.beginPath();for(let i=0;i<=200;i++){const x=i/200;c.lineTo(x*W,(1-f(x))*H)}c.stroke();c.globalAlpha=1}
+function curvePoint(e){const r=curveCanvas.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:1-(e.clientY-r.top)/r.height,size:r.width}}
+function nearestCurvePoint(pt){const pts=curves[curveChannel];let best=-1,bd=1e9;pts.forEach((p,i)=>{const d=Math.hypot(p[0]-pt.x,p[1]-pt.y)*pt.size;if(d<bd){bd=d;best=i}});return bd<14?best:-1}
+curveCanvas.addEventListener('pointerdown',e=>{
+  const pt=curvePoint(e),pts=curves[curveChannel];let idx=nearestCurvePoint(pt);
+  if(idx<0){if(pts.length>=16){message.textContent='点は16個までです。';return}const x=clamp01(pt.x);if(pts.some(p=>Math.abs(p[0]-x)<.02))return;
+    pts.push([x,clamp01(pt.y)]);pts.sort((a,b)=>a[0]-b[0]);idx=pts.findIndex(p=>p[0]===x)}
+  curveDrag={idx,moved:true};curveCanvas.setPointerCapture(e.pointerId);drawCurve();values();requestDraw();
+});
+curveCanvas.addEventListener('pointermove',e=>{
+  if(!curveDrag)return;const pt=curvePoint(e),pts=curves[curveChannel],i=curveDrag.idx,last=pts.length-1;
+  if(i>0&&i<last&&(pt.y<-.12||pt.y>1.12)){pts.splice(i,1);curveDrag=null;drawCurve();values();requestDraw();pushHistory();return}
+  const lo=i>0?pts[i-1][0]+.01:0,hi=i<last?pts[i+1][0]-.01:1;pts[i]=[Math.min(hi,Math.max(lo,pt.x)),clamp01(pt.y)];drawCurve();values();requestDraw();
+});
+curveCanvas.addEventListener('pointerup',()=>{if(curveDrag){curveDrag=null;pushHistory()}});
+curveCanvas.addEventListener('pointercancel',()=>{if(curveDrag){curveDrag=null;pushHistory()}});
+curveCanvas.addEventListener('dblclick',e=>{const pts=curves[curveChannel],i=nearestCurvePoint(curvePoint(e));if(i>0&&i<pts.length-1){pts.splice(i,1);drawCurve();values();requestDraw();pushHistory()}});
+document.querySelectorAll('#curveChannels button').forEach(b=>b.addEventListener('click',()=>{curveChannel=b.dataset.channel;document.querySelectorAll('#curveChannels button').forEach(x=>x.classList.toggle('active',x===b));drawCurve()}));
+$('curveS').addEventListener('click',()=>{curves[curveChannel]=[[0,0],[.25,.2],[.75,.8],[1,1]];drawCurve();values();requestDraw();pushHistory()});
+$('curveReset').addEventListener('click',()=>{curves[curveChannel]=[[0,0],[1,1]];drawCurve();values();requestDraw();pushHistory()});
+
+/* ===== ヒストグラム ===== */
+function drawHistogram(d){
+  const hr=new Uint32Array(256),hg=new Uint32Array(256),hb=new Uint32Array(256),hl=new Uint32Array(256);let lo=0,hi=0;const n=d.length/4;
+  for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2],l=Math.round(.2126*r+.7152*g+.0722*b);hr[r]++;hg[g]++;hb[b]++;hl[l]++;if(l<=1)lo++;if(r>=254&&g>=254&&b>=254)hi++}
+  lumHist=hl;const c=$('histogram'),ctx=c.getContext('2d'),W=c.width,H=c.height;ctx.clearRect(0,0,W,H);
+  let mx=1;for(let i=2;i<254;i++)mx=Math.max(mx,hr[i],hg[i],hb[i]);
+  ctx.globalCompositeOperation='lighter';
+  for(const[arr,col]of[[hr,'rgba(255,70,70,.55)'],[hg,'rgba(70,220,90,.55)'],[hb,'rgba(80,140,255,.55)']]){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,H);for(let i=0;i<256;i++)ctx.lineTo(i/255*W,H-Math.min(1,arr[i]/mx)*H*.95);ctx.lineTo(W,H);ctx.fill()}
+  ctx.globalCompositeOperation='source-over';
+  const pl=lo/n*100,ph=hi/n*100,fmt=v=>v<.05?'0%':v.toFixed(1)+'%';
+  $('clipLow').textContent='黒つぶれ '+fmt(pl);$('clipHigh').textContent='白とび '+fmt(ph);$('clipLow').classList.toggle('warn',pl>=.5);$('clipHigh').classList.toggle('warn',ph>=.5);
+  if(activeEffect==='curve')drawCurve();
 }
-function process(canvas,scale){const v=values();applyTone(canvas,v);applyFiltered(canvas,'blur',v.blur,scale);applyFiltered(canvas,'sharpness',v.sharpness,scale)}
+
+/* ===== 画面表示 ===== */
+let drawQueued=false;
+function requestDraw(){if(drawQueued)return;drawQueued=true;requestAnimationFrame(()=>{drawQueued=false;draw()})}
+function draw(){
+  if(!source)return;const pw=preview.width,ph=preview.height,ctx=preview.getContext('2d');
+  if(appMode==='texture'){ctx.putImageData(basePreview,0,0);renderTexture(preview,activeMap,previewScale);lastOutput=null;drawOverlay();return}
+  const P=buildParams(pw,ph,previewScale),J=JSON.stringify;
+  /* 変更した項目より後の工程だけを計算し直す */
+  const defs=[
+    [J([TONE_IDS.map(id=>[P.v[id],P.scopes[id]]),P.curves]),d=>toneStage(d,pw,ph,P)],
+    [paintRev+'/'+P.v.paintOpacity,d=>paintStage(d,pw,ph,P,paintData())],
+    [J([P.v.glow,P.v.glowRadius,P.v.glowThreshold,P.scopes.glow]),d=>{lastGlowGrid=P.v.glow>0?glowGrid(d,pw,ph,P):null;if(lastGlowGrid)glowApply(d,pw,ph,P,lastGlowGrid)}],
+    [J([P.v.blur,P.scopes.blur]),d=>blurStage(d,pw,ph,P)],
+    [J([P.v.sharpness,P.scopes.sharpness]),d=>sharpenStage(d,pw,ph,P)],
+    [J([P.v.vignette,P.v.grain,P.v.size,P.scopes.grain]),d=>finalStage(d,pw,ph,P)]];
+  let key=String(imageSerial),prev=basePreview.data;
+  defs.forEach(([k,fn],i)=>{key+='|'+k;const c=stageCache[i];if(c&&c.key===key){prev=c.data;return}const d=new Uint8ClampedArray(prev);fn(d);stageCache[i]={key,data:d};prev=d});
+  const out=prev;
+  lastOutput=new ImageData(new Uint8ClampedArray(out),pw,ph);drawHistogram(out);composite();
+  if(loupeOn&&pointer)updateLoupe();
+}
+function composite(){
+  if(appMode!=='photo'||!lastOutput)return;const ctx=preview.getContext('2d');ctx.putImageData(lastOutput,0,0);
+  if(compareMode){const sx=Math.round(splitPos*preview.width);if(sx>0)ctx.putImageData(basePreview,0,0,0,0,sx,preview.height)}
+  drawOverlay();
+}
+const paintView=document.createElement('canvas');
+function drawOverlay(){
+  const c=overlay.getContext('2d'),W=overlay.width,H=overlay.height;c.clearRect(0,0,W,H);if(!source||appMode!=='photo')return;
+  if($('showPaint').checked&&hasPaint&&!compareMode){paintView.width=W;paintView.height=H;const pc=paintView.getContext('2d');pc.clearRect(0,0,W,H);pc.drawImage(paintCanvas,0,0,W,H);pc.globalCompositeOperation='source-in';pc.fillStyle='#35d0ff';pc.fillRect(0,0,W,H);pc.globalCompositeOperation='source-over';c.globalAlpha=.6;c.drawImage(paintView,0,0);c.globalAlpha=1}
+  c.save();c.strokeStyle='#fff';c.lineWidth=2;c.shadowColor='#000';c.shadowBlur=3;
+  if(compareMode){const x=splitPos*W;c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();c.font='bold 14px sans-serif';c.fillStyle='#fff';c.textBaseline='top';c.textAlign='right';c.fillText('仕上げ前',x-10,10);c.textAlign='left';c.fillText('仕上げ後',x+10,10)}
+  else if(activeEffect==='brush'){if(pointer){const r=Number($('brushSize').value)/100*Math.max(W,H)/2,x=pointer.x*W,y=pointer.y*H;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.stroke();const hr=r*Number($('brushHardness').value)/100;if(hr>3){c.setLineDash([4,4]);c.beginPath();c.arc(x,y,hr,0,Math.PI*2);c.stroke()}}}
+  else if(states[activeEffect]&&SCOPED_UI.includes(activeEffect)&&states[activeEffect].mode==='local'){const s=states[activeEffect],x=s.x*W,y=s.y*H,r=Math.min(W,H)*s.radius/100;c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.moveTo(x-15,y);c.lineTo(x+15,y);c.moveTo(x,y-15);c.lineTo(x,y+15);c.stroke();c.setLineDash([7,5]);c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.stroke()}
+  c.restore();
+}
+function fitPreview(){if(!source)return;const s=Math.min(main.clientWidth/source.width,main.clientHeight/source.height);stage.style.width=Math.max(1,Math.floor(source.width*s))+'px';stage.style.height=Math.max(1,Math.floor(source.height*s))+'px'}
+function setupPreview(){
+  previewScale=Math.min(1,1400/source.width,900/source.height);const pw=Math.max(1,Math.round(source.width*previewScale)),ph=Math.max(1,Math.round(source.height*previewScale));
+  preview.width=overlay.width=pw;preview.height=overlay.height=ph;const c=document.createElement('canvas');c.width=pw;c.height=ph;const cx=c.getContext('2d',{willReadFrequently:true});cx.imageSmoothingQuality='high';cx.drawImage(source,0,0,pw,ph);
+  basePreview=cx.getImageData(0,0,pw,ph);stageCache=[];fitPreview();
+}
+
+/* ===== 拡大鏡（等倍表示） ===== */
+let loupeQueued=false;const LOUPE=260;
+function updateLoupe(){if(loupeQueued)return;loupeQueued=true;requestAnimationFrame(()=>{loupeQueued=false;renderLoupe()})}
+function renderLoupe(){
+  if(!loupeOn||!pointer||!source||appMode!=='photo'||painting||compareMode){loupe.hidden=true;return}
+  const W=source.width,H=source.height,v=values(),cw0=Math.min(LOUPE,W),ch0=Math.min(LOUPE,H);
+  const x0=Math.max(0,Math.min(W-cw0,Math.round(pointer.x*W-cw0/2))),y0=Math.max(0,Math.min(H-ch0,Math.round(pointer.y*H-ch0/2)));
+  const margin=Math.min(200,Math.ceil(3*Math.max(v.blur,1.2))+4),cx0=Math.max(0,x0-margin),cy0=Math.max(0,y0-margin),cx1=Math.min(W,x0+cw0+margin),cy1=Math.min(H,y0+ch0+margin),cw=cx1-cx0,ch=cy1-cy0;
+  const tmp=document.createElement('canvas');tmp.width=cw;tmp.height=ch;const tc=tmp.getContext('2d',{willReadFrequently:true});tc.drawImage(source,cx0,cy0,cw,ch,0,0,cw,ch);
+  const img=tc.getImageData(0,0,cw,ch),d=img.data,P=buildParams(cw,ch,1,{fw:W,fh:H,ox:cx0,oy:cy0});
+  toneStage(d,cw,ch,P);paintStage(d,cw,ch,P,paintData());if(lastGlowGrid)glowApply(d,cw,ch,P,lastGlowGrid);blurStage(d,cw,ch,P);sharpenStage(d,cw,ch,P);finalStage(d,cw,ch,P);
+  const lc=loupe.getContext('2d');lc.fillStyle='#000';lc.fillRect(0,0,LOUPE,LOUPE);lc.putImageData(img,-(x0-cx0),-(y0-cy0),x0-cx0,y0-cy0,cw0,ch0);
+  const mr=main.getBoundingClientRect();let lx=pointer.cx-mr.left+24,ly=pointer.cy-mr.top+24;if(lx+LOUPE+4>mr.width)lx=pointer.cx-mr.left-LOUPE-24;if(ly+LOUPE+4>mr.height)ly=pointer.cy-mr.top-LOUPE-24;
+  loupe.style.left=Math.max(4,lx)+'px';loupe.style.top=Math.max(4,ly)+'px';loupe.hidden=false;
+}
+
+/* ===== 画像の上の操作 ===== */
+function normPoint(e){const r=overlay.getBoundingClientRect();return{x:Math.max(0,Math.min(1,(e.clientX-r.left)/r.width)),y:Math.max(0,Math.min(1,(e.clientY-r.top)/r.height)),cx:e.clientX,cy:e.clientY}}
+overlay.addEventListener('pointerdown',e=>{
+  if(!source||appMode!=='photo'||busy||e.button!==0)return;const pt=normPoint(e);pointer=pt;
+  if(compareMode){draggingSplit=true;overlay.setPointerCapture(e.pointerId);splitPos=pt.x;composite();return}
+  if(activeEffect==='brush'){painting=true;loupe.hidden=true;overlay.setPointerCapture(e.pointerId);lastPaint={x:pt.x*paintCanvas.width,y:pt.y*paintCanvas.height};dab(lastPaint.x,lastPaint.y);requestDraw();return}
+  const s=states[activeEffect];
+  if(!s||!SCOPED_UI.includes(activeEffect)||s.mode!=='local'){message.textContent=SCOPED_UI.includes(activeEffect)?'範囲を指定するには、先に調整項目の「範囲」ボタンを押してください。':'';return}
+  draggingScope=true;overlay.setPointerCapture(e.pointerId);s.x=pt.x;s.y=pt.y;requestDraw();
+});
+overlay.addEventListener('pointermove',e=>{
+  if(!source||appMode!=='photo')return;const pt=normPoint(e);pointer=pt;
+  if(draggingSplit){splitPos=pt.x;composite();return}
+  if(painting){strokeTo(pt.x,pt.y);requestDraw();return}
+  if(draggingScope){const s=states[activeEffect];s.x=pt.x;s.y=pt.y;requestDraw();return}
+  if(activeEffect==='brush')drawOverlay();if(loupeOn)updateLoupe();
+});
+function endPointer(){if(painting){painting=false;endStroke();requestDraw()}if(draggingScope){draggingScope=false;pushHistory();message.textContent=names[activeEffect]+'の中心を移動しました。'}draggingSplit=false}
+overlay.addEventListener('pointerup',endPointer);overlay.addEventListener('pointercancel',endPointer);
+overlay.addEventListener('pointerleave',()=>{if(painting||draggingScope||draggingSplit)return;pointer=null;loupe.hidden=true;drawOverlay()});
+
+/* ===== テクスチャマップ（従来どおり） ===== */
 function textureValues(){
-  const v={normalStrength:Number(document.getElementById('normalStrength').value),normalSmooth:Number(document.getElementById('normalSmooth').value),normalInvertY:document.getElementById('normalInvertY').checked,
-    aoStrength:Number(document.getElementById('aoStrength').value),aoRadius:Number(document.getElementById('aoRadius').value),heightContrast:Number(document.getElementById('heightContrast').value),heightSmooth:Number(document.getElementById('heightSmooth').value),heightInvert:document.getElementById('heightInvert').checked};
-  document.getElementById('normalStrengthValue').textContent=v.normalStrength.toFixed(1);document.getElementById('normalSmoothValue').textContent=v.normalSmooth+' px';
-  document.getElementById('aoStrengthValue').textContent=v.aoStrength+'%';document.getElementById('aoRadiusValue').textContent=v.aoRadius+' px';
-  document.getElementById('heightContrastValue').textContent=v.heightContrast+'%';document.getElementById('heightSmoothValue').textContent=v.heightSmooth+' px';return v;
+  const v={normalStrength:Number($('normalStrength').value),normalSmooth:Number($('normalSmooth').value),normalInvertY:$('normalInvertY').checked,aoStrength:Number($('aoStrength').value),aoRadius:Number($('aoRadius').value),heightContrast:Number($('heightContrast').value),heightSmooth:Number($('heightSmooth').value),heightInvert:$('heightInvert').checked};
+  $('normalStrengthValue').textContent=v.normalStrength.toFixed(1);$('normalSmoothValue').textContent=v.normalSmooth+' px';$('aoStrengthValue').textContent=v.aoStrength+'%';$('aoRadiusValue').textContent=v.aoRadius+' px';$('heightContrastValue').textContent=v.heightContrast+'%';$('heightSmoothValue').textContent=v.heightSmooth+' px';return v;
 }
 function blurGray(input,w,h,r){r=Math.max(0,Math.round(r));if(!r)return new Float32Array(input);const horizontal=new Float32Array(w*h),out=new Float32Array(w*h),prefix=new Float64Array(Math.max(w,h)+1);
   for(let y=0;y<h;y++){prefix[0]=0;for(let x=0;x<w;x++)prefix[x+1]=prefix[x]+input[y*w+x];for(let x=0;x<w;x++){const a=Math.max(0,x-r),b=Math.min(w-1,x+r);horizontal[y*w+x]=(prefix[b+1]-prefix[a])/(b-a+1)}}
-  for(let x=0;x<w;x++){prefix[0]=0;for(let y=0;y<h;y++)prefix[y+1]=prefix[y]+horizontal[y*w+x];for(let y=0;y<h;y++){const a=Math.max(0,y-r),b=Math.min(h-1,y+r);out[y*w+x]=(prefix[b+1]-prefix[a])/(b-a+1)}}return out;
-}
+  for(let x=0;x<w;x++){prefix[0]=0;for(let y=0;y<h;y++)prefix[y+1]=prefix[y]+horizontal[y*w+x];for(let y=0;y<h;y++){const a=Math.max(0,y-r),b=Math.min(h-1,y+r);out[y*w+x]=(prefix[b+1]-prefix[a])/(b-a+1)}}return out}
 function sourceGray(canvas){const ctx=canvas.getContext('2d',{willReadFrequently:true}),frame=ctx.getImageData(0,0,canvas.width,canvas.height),p=frame.data,g=new Float32Array(canvas.width*canvas.height);for(let i=0,j=0;i<p.length;i+=4,j++)g[j]=(p[i]*.2126+p[i+1]*.7152+p[i+2]*.0722)/255;return g}
 function renderTexture(canvas,map,scale){const ctx=canvas.getContext('2d',{willReadFrequently:true}),w=canvas.width,h=canvas.height,v=textureValues(),raw=sourceGray(canvas),frame=ctx.createImageData(w,h),p=frame.data;
   if(map==='normal'){const g=blurGray(raw,w,h,Math.round(v.normalSmooth*scale)),strength=v.normalStrength;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x,l=g[y*w+Math.max(0,x-1)],r=g[y*w+Math.min(w-1,x+1)],u=g[Math.max(0,y-1)*w+x],d=g[Math.min(h-1,y+1)*w+x];let nx=-(r-l)*strength,ny=-(d-u)*strength;if(v.normalInvertY)ny=-ny;const inv=1/Math.hypot(nx,ny,1),j=i*4;p[j]=Math.round((nx*inv*.5+.5)*255);p[j+1]=Math.round((ny*inv*.5+.5)*255);p[j+2]=Math.round((inv*.5+.5)*255);p[j+3]=255}}
@@ -252,28 +590,101 @@ function renderTexture(canvas,map,scale){const ctx=canvas.getContext('2d',{willR
   else{const g=blurGray(raw,w,h,Math.round(v.heightSmooth*scale)),contrast=v.heightContrast/100;for(let i=0;i<g.length;i++){let value=Math.max(0,Math.min(1,(g[i]-.5)*contrast+.5));if(v.heightInvert)value=1-value;const c=Math.round(value*255),j=i*4;p[j]=p[j+1]=p[j+2]=c;p[j+3]=255}}
   ctx.putImageData(frame,0,0);
 }
-function overlay(){const s=states[activeEffect];if(s.mode!=='local'||compareMode)return;const c=preview.getContext('2d'),x=s.x*preview.width,y=s.y*preview.height,r=Math.min(preview.width,preview.height)*s.radius/100;
-  c.save();c.strokeStyle='#fff';c.lineWidth=2;c.shadowColor='#000';c.shadowBlur=3;c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.moveTo(x-15,y);c.lineTo(x+15,y);c.moveTo(x,y-15);c.lineTo(x,y+15);c.stroke();c.setLineDash([7,5]);c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.stroke();c.restore();}
-function fitPreview(){if(!source)return;const scale=Math.min(main.clientWidth/source.width,main.clientHeight/source.height);preview.style.width=Math.max(1,Math.floor(source.width*scale))+'px';preview.style.height=Math.max(1,Math.floor(source.height*scale))+'px'}
-function draw(){timer=0;if(!source)return;const scale=Math.min(1,1400/source.width,900/source.height);preview.width=Math.max(1,Math.round(source.width*scale));preview.height=Math.max(1,Math.round(source.height*scale));preview.getContext('2d').drawImage(source,0,0,preview.width,preview.height);if(appMode==='texture')renderTexture(preview,activeMap,scale);else{if(!compareMode)process(preview,scale);overlay()}fitPreview()}
-function schedule(){if(appMode==='photo')values();else textureValues();clearTimeout(timer);timer=setTimeout(draw,70)}
-document.querySelectorAll('input[type=range],input[type=checkbox]').forEach(el=>el.addEventListener('input',schedule));
-preview.addEventListener('pointerdown',event=>{if(appMode!=='photo')return;const s=states[activeEffect];if(s.mode!=='local'){message.textContent='先に調整項目の「範囲」を選んでください。';return}const rect=preview.getBoundingClientRect();s.x=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));s.y=Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));message.textContent=names[activeEffect]+'の中心を移動しました。';draw()});
-document.querySelectorAll('.effect-tab').forEach(tab=>tab.addEventListener('click',()=>{activeEffect=tab.dataset.effectTab;selectEffect(activeEffect);message.textContent=names[activeEffect]+'を調整します。';draw()}));
+
+/* ===== 保存（解像度dpiの書き込み付き） ===== */
+const CRC_TABLE=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+function crc32(b){let c=0xFFFFFFFF;for(let i=0;i<b.length;i++)c=CRC_TABLE[(c^b[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0}
+function setPngDpi(buf,dpi){
+  const u=new Uint8Array(buf),dv=new DataView(buf);if(u[1]!==0x50||u[2]!==0x4E||u[3]!==0x47)return u;
+  const parts=[u.subarray(0,8)];let off=8,inserted=false;
+  while(off+8<=u.length){const len=dv.getUint32(off),type=String.fromCharCode(u[off+4],u[off+5],u[off+6],u[off+7]),end=off+12+len;
+    if(type!=='pHYs')parts.push(u.subarray(off,end));
+    if(type==='IHDR'&&!inserted){const ppm=Math.round(dpi/.0254),c=new Uint8Array(21),cd=new DataView(c.buffer);cd.setUint32(0,9);c.set([0x70,0x48,0x59,0x73],4);cd.setUint32(8,ppm);cd.setUint32(12,ppm);c[16]=1;cd.setUint32(17,crc32(c.subarray(4,17)));parts.push(c);inserted=true}
+    off=end;}
+  const out=new Uint8Array(parts.reduce((s,p)=>s+p.length,0));let o=0;for(const p of parts){out.set(p,o);o+=p.length}return out;
+}
+function setJpegDpi(buf,dpi){
+  const u=new Uint8Array(buf);if(u[0]!==0xFF||u[1]!==0xD8)return u;
+  if(u[2]===0xFF&&u[3]===0xE0&&u[6]===0x4A&&u[7]===0x46&&u[8]===0x49&&u[9]===0x46&&u[10]===0){const c=new Uint8Array(u);c[13]=1;c[14]=dpi>>8;c[15]=dpi&255;c[16]=dpi>>8;c[17]=dpi&255;return c}
+  const app=new Uint8Array([0xFF,0xE0,0,16,0x4A,0x46,0x49,0x46,0,1,1,1,dpi>>8,dpi&255,dpi>>8,dpi&255,0,0]),out=new Uint8Array(u.length+app.length);out.set(u.subarray(0,2),0);out.set(app,2);out.set(u.subarray(2),2+app.length);return out;
+}
+const WORKER_MAIN='\nself.onmessage=function(e){var m=e.data;try{renderPhoto(m.data,m.w,m.h,m.P,m.paint,function(f){self.postMessage({progress:f})});self.postMessage({done:true,data:m.data},[m.data.buffer])}catch(err){self.postMessage({error:String(err&&err.message||err)})}};';
+function runEngine(data,w,h,P,paint){
+  return new Promise((resolve,reject)=>{
+    const local=()=>{message.textContent='元の解像度で仕上げ中…（大きい画像は少し時間がかかります）';setTimeout(()=>{try{renderPhoto(data,w,h,P,paint);resolve(data)}catch(e){reject(e)}},40)};
+    let wk,url;try{url=URL.createObjectURL(new Blob([$('engine').textContent,WORKER_MAIN],{type:'text/javascript'}));wk=new Worker(url)}catch(e){if(url)URL.revokeObjectURL(url);local();return}
+    let started=false;const done=()=>{wk.terminate();URL.revokeObjectURL(url)};
+    wk.onmessage=e=>{const m=e.data;started=true;if(m.progress!=null){message.textContent='元の解像度で仕上げ中… '+Math.round(m.progress*100)+'%';return}done();if(m.error)reject(Error(m.error));else resolve(m.data)};
+    wk.onerror=e=>{e.preventDefault();done();if(started)reject(Error(e.message||'処理に失敗しました'));else local()};
+    wk.postMessage({data,w,h,P,paint});
+  });
+}
+function toBlobAsync(canvas,type,q){return new Promise(res=>canvas.toBlob(res,type,q))}
+async function saveImage(){
+  if(!source||busy)return;busy=true;save.disabled=true;updateUndo();message.textContent='元の解像度で保存の準備中…';
+  await new Promise(r=>setTimeout(r,30));
+  try{
+    const W=source.width,H=source.height,isPng=saveFormat.value==='png',dpi=Number(saveDpi.value),full=document.createElement('canvas');full.width=W;full.height=H;
+    const ctx=full.getContext('2d',{willReadFrequently:true});if(!isPng){ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H)}ctx.drawImage(source,0,0);
+    if(appMode==='texture')renderTexture(full,activeMap,1);
+    else{const img=ctx.getImageData(0,0,W,H),pd=paintData(),paint=pd?{data:new Uint8ClampedArray(pd.data),w:pd.w,h:pd.h}:null;const out=await runEngine(img.data,W,H,buildParams(W,H,1),paint);ctx.putImageData(new ImageData(out,W,H),0,0)}
+    message.textContent='ファイルを書き出し中…';
+    const blob=await toBlobAsync(full,isPng?'image/png':'image/jpeg',isPng?undefined:.95);if(!blob)throw Error('画像が大きすぎる可能性があります');
+    const bytes=isPng?setPngDpi(await blob.arrayBuffer(),dpi):setJpegDpi(await blob.arrayBuffer(),dpi);
+    const suffix=(appMode==='texture'?{normal:'_normal',ao:'_ao',height:'_height'}[activeMap]:'_仕上げ')+(isPng?'.png':'.jpg');
+    const href=URL.createObjectURL(new Blob([bytes],{type:isPng?'image/png':'image/jpeg'})),a=document.createElement('a');a.href=href;a.download=filename+suffix;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(href),60000);
+    message.textContent=W+'×'+H+'px・'+dpi+'dpi の'+(isPng?'PNG':'JPEG')+'で保存しました。';
+  }catch(e){message.textContent='保存できませんでした: '+e.message}
+  busy=false;save.disabled=!source;updateUndo();
+}
+
+/* ===== 画像の読み込み ===== */
+async function loadImageFile(selected){
+  if(!selected)return;if(!['image/png','image/jpeg','image/webp'].includes(selected.type)){message.textContent='画像ファイル（PNG・JPG・WebP）を選んでください。';return}
+  try{const bitmap=await createImageBitmap(selected);if(source)source.close();source=bitmap;imageSerial++;filename=selected.name.replace(/\.(png|jpe?g|webp)$/i,'');
+    info.textContent=selected.name+' · '+bitmap.width+' × '+bitmap.height+' px';main.classList.add('has-image');setupPreview();setupPaint();
+    history=[];hIndex=-1;pushHistory();save.disabled=false;compare.disabled=appMode==='texture';loupeBtn.disabled=appMode==='texture';values();
+    message.textContent=appMode==='texture'?'生成するマップを選び、強さを調整してください。':'各項目で「全体」または「範囲」を選べます。調整値は前の画像のまま引き継いでいます。';draw();
+  }catch(e){message.textContent='画像を開けませんでした: '+e.message}
+}
+
+/* ===== ボタンなどのつなぎ込み ===== */
+for(const id of PARAM_IDS){const el=$(id);el.addEventListener('input',()=>{values();requestDraw()});el.addEventListener('change',pushHistory)}
+for(const id of['brushSize','brushHardness','brushFlow'])$(id).addEventListener('input',()=>{values();drawOverlay()});
+document.querySelectorAll('input[type=range]').forEach(el=>el.addEventListener('dblclick',()=>{el.value=el.defaultValue;el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}))}));
+document.querySelectorAll('.tex').forEach(el=>el.addEventListener('input',()=>{textureValues();requestDraw()}));
+$('showPaint').addEventListener('change',drawOverlay);
+document.querySelectorAll('#brushModes button').forEach(b=>b.addEventListener('click',()=>{brushMode=b.dataset.brush;document.querySelectorAll('#brushModes button').forEach(x=>x.classList.toggle('active',x===b));$('brushColorRow').style.opacity=brushMode==='color'?1:.45}));
+$('brushColorRow').style.opacity=.45;$('brushColor').addEventListener('input',()=>{if(brushMode!=='color')document.querySelector('#brushModes [data-brush="color"]').click()});
+$('paintClear').addEventListener('click',()=>{if(!hasPaint)return;paintCtx.clearRect(0,0,paintCanvas.width,paintCanvas.height);paintSnap=null;hasPaint=false;paintDataCache=null;paintRev++;paintVersion=++paintCounter;pushHistory();values();requestDraw();message.textContent='ブラシで塗った内容を消しました（「元に戻す」で戻せます）。'});
+document.querySelectorAll('.effect-tab').forEach(tab=>tab.addEventListener('click',()=>{selectEffect(tab.dataset.effectTab);
+  message.textContent=activeEffect==='brush'?'画像の上をドラッグして塗ってください。［ ］キーでブラシの大きさを変えられます。':names[activeEffect]+'を調整します。'}));
 function updateSaveLabel(){save.textContent=(saveFormat.value==='png'?'PNG':'高画質JPEG')+'で保存'}
-saveFormat.addEventListener('change',updateSaveLabel);
-document.querySelectorAll('.mode-button').forEach(button=>button.addEventListener('click',()=>{appMode=button.dataset.appMode;document.querySelectorAll('.mode-button').forEach(b=>b.classList.toggle('active',b===button));photoControls.classList.toggle('hidden',appMode!=='photo');textureControls.classList.toggle('active',appMode==='texture');compare.hidden=appMode==='texture';updateSaveLabel();message.textContent=appMode==='texture'?'生成するマップを選び、強さを調整してください。':'各項目で「全体」または「範囲」を選べます。';compareMode=false;compare.textContent='元画像と比較';draw()}));
-document.querySelectorAll('.map-tab').forEach(button=>button.addEventListener('click',()=>{activeMap=button.dataset.map;document.querySelectorAll('.map-tab').forEach(b=>b.classList.toggle('active',b===button));document.querySelectorAll('.map-panel').forEach(panel=>panel.classList.toggle('current',panel.dataset.mapPanel===activeMap));draw()}));
-initScopes();values();textureValues();updateSaveLabel();initPresets();
+saveFormat.addEventListener('change',updateSaveLabel);save.addEventListener('click',saveImage);
+undoBtn.addEventListener('click',undo);redoBtn.addEventListener('click',redo);resetAllBtn.addEventListener('click',resetAll);
+compare.addEventListener('click',()=>{compareMode=!compareMode;compare.textContent=compareMode?'比較をやめる':'元画像と比較';compare.classList.toggle('on',compareMode);selectEffect(activeEffect);loupe.hidden=true;composite();
+  message.textContent=compareMode?'左が仕上げ前、右が仕上げ後です。画像の上をドラッグすると境目を動かせます。':'比較を終了しました。'});
+loupeBtn.addEventListener('click',()=>{loupeOn=!loupeOn;loupeBtn.classList.toggle('on',loupeOn);if(!loupeOn)loupe.hidden=true;message.textContent=loupeOn?'画像の上にカーソルを乗せると、保存時と同じ大きさ（等倍）で表示します。':'拡大鏡を閉じました。'});
+document.querySelectorAll('.mode-button').forEach(button=>button.addEventListener('click',()=>{
+  appMode=button.dataset.appMode;document.querySelectorAll('.mode-button').forEach(b=>b.classList.toggle('active',b===button));photoControls.classList.toggle('hidden',appMode!=='photo');textureControls.classList.toggle('active',appMode==='texture');
+  compare.hidden=loupeBtn.hidden=appMode==='texture';compare.disabled=loupeBtn.disabled=!source;compareMode=false;compare.textContent='元画像と比較';compare.classList.remove('on');loupe.hidden=true;
+  updateSaveLabel();updateUndo();selectEffect(activeEffect);message.textContent=appMode==='texture'?'生成するマップを選び、強さを調整してください。':'各項目で「全体」または「範囲」を選べます。';draw();
+}));
+document.querySelectorAll('.map-tab').forEach(b=>b.addEventListener('click',()=>{activeMap=b.dataset.map;document.querySelectorAll('.map-tab').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.map-panel').forEach(p=>p.classList.toggle('current',p.dataset.mapPanel===activeMap));draw()}));
+document.addEventListener('keydown',e=>{
+  const t=e.target;if(t&&(t.tagName==='INPUT'&&t.type==='text'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'))return;
+  const k=e.key.toLowerCase();
+  if((e.ctrlKey||e.metaKey)&&k==='z'){e.preventDefault();e.shiftKey?redo():undo();return}
+  if((e.ctrlKey||e.metaKey)&&k==='y'){e.preventDefault();redo();return}
+  if(appMode==='photo'&&activeEffect==='brush'&&(e.key==='['||e.key===']')){const el=$('brushSize');el.value=Number(el.value)+(e.key===']'?1:-1)*Math.max(1,Math.round(Number(el.value)*.15));values();drawOverlay()}
+});
+file.addEventListener('change',()=>{loadImageFile(file.files?.[0]);file.value=''});
+document.addEventListener('dragover',e=>e.preventDefault());document.addEventListener('drop',e=>{e.preventDefault();if(!main.contains(e.target))message.textContent='画像表示欄へ画像ファイルをドロップしてください。'});
+main.addEventListener('dragenter',e=>{e.preventDefault();main.classList.add('drag-over')});main.addEventListener('dragover',e=>{e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='copy';main.classList.add('drag-over')});
+main.addEventListener('dragleave',e=>{if(!main.contains(e.relatedTarget))main.classList.remove('drag-over')});
+main.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();main.classList.remove('drag-over');const f=e.dataTransfer?.files?.[0];if(!f){message.textContent='画像ファイルが見つかりませんでした。';return}loadImageFile(f)});
 if('ResizeObserver' in window)new ResizeObserver(fitPreview).observe(main);else window.addEventListener('resize',fitPreview);
-compare.addEventListener('click',()=>{compareMode=!compareMode;compare.textContent=compareMode?'編集後に戻す':'元画像と比較';draw()});
-async function loadImageFile(selected){if(!selected)return;if(!['image/png','image/jpeg','image/webp'].includes(selected.type)){message.textContent='画像ファイル（PNG・JPG・WebP）を選んでください。';return}
-  try{const bitmap=await createImageBitmap(selected);if(source)source.close();source=bitmap;filename=selected.name.replace(/\.(png|jpe?g|webp)$/i,'');info.textContent=selected.name+' · '+bitmap.width+' × '+bitmap.height+' px';message.textContent=appMode==='texture'?'生成するマップを選び、強さを調整してください。':'各項目で「全体」または「範囲」を選べます。';save.disabled=false;compare.disabled=false;main.classList.add('has-image');draw()}catch(e){message.textContent='画像を開けませんでした: '+e.message}}
-file.addEventListener('change',()=>loadImageFile(file.files?.[0]));
-document.addEventListener('dragover',event=>event.preventDefault());document.addEventListener('drop',event=>{event.preventDefault();if(!main.contains(event.target))message.textContent='画像表示欄へ画像ファイルをドロップしてください。'});
-main.addEventListener('dragenter',event=>{event.preventDefault();main.classList.add('drag-over')});main.addEventListener('dragover',event=>{event.preventDefault();if(event.dataTransfer)event.dataTransfer.dropEffect='copy';main.classList.add('drag-over')});
-main.addEventListener('dragleave',event=>{if(!main.contains(event.relatedTarget))main.classList.remove('drag-over')});main.addEventListener('drop',event=>{event.preventDefault();event.stopPropagation();main.classList.remove('drag-over');const selected=event.dataTransfer?.files?.[0];if(!selected){message.textContent='画像ファイルが見つかりませんでした。';return}loadImageFile(selected)});
-save.addEventListener('click',()=>{if(!source)return;save.disabled=true;message.textContent='元の解像度で保存中…';setTimeout(()=>{try{const full=document.createElement('canvas');full.width=source.width;full.height=source.height;const ctx=full.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,full.width,full.height);ctx.drawImage(source,0,0);if(appMode==='texture')renderTexture(full,activeMap,1);else process(full,1);const format=saveFormat.value,isPng=format==='png',type=isPng?'image/png':'image/jpeg',extension=isPng?'.png':'.jpg',baseSuffix=appMode==='texture'?{normal:'_normal',ao:'_ao',height:'_height'}[activeMap]:'_仕上げ',suffix=baseSuffix+extension;full.toBlob(blob=>{if(!blob){message.textContent='保存できませんでした。';save.disabled=false;return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename+suffix;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);message.textContent='元の解像度の'+(isPng?'PNG':'JPEG')+'で保存しました。';save.disabled=false},type,isPng?undefined:.92)}catch(e){message.textContent='保存できませんでした: '+e.message;save.disabled=false}},30)});
+initScopes();values();textureValues();updateSaveLabel();initPresets();drawCurve();selectEffect('brightness');updateUndo();
 </script>
 </body>
 </html>
