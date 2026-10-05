@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>建築パース仕上げ</title>
+<style>
+:root{font-family:"Segoe UI",sans-serif;color:#eee;background:#1d1d1d}
+*{box-sizing:border-box}body{margin:0;padding:12px;display:grid;grid-template-columns:280px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;height:100vh;gap:12px}
+header{grid-column:1/-1;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:20px;margin:0 16px 0 0;font-weight:600}
+button,.file{background:#454b52;color:#fff;border:0;border-radius:7px;padding:10px 15px;font:inherit;cursor:pointer;transition:background .15s,box-shadow .15s,transform .15s}
+button:not(:disabled):hover,.file:hover{background:#59616a}.file{background:#9a6425}.file:hover{background:#b9782f}#save{background:#2f78b7}#save:not(:disabled):hover{background:#3d8dce}#compare{background:#4b535b}#compare:not(:disabled):hover{background:#626c76}
+button:disabled{opacity:.5;cursor:default}.file input{display:none}
+.mode-switch{display:flex;gap:6px}.mode-button[data-app-mode="photo"]{background:#365d59;color:#fff}.mode-button[data-app-mode="photo"]:hover{background:#416a65}.mode-button[data-app-mode="photo"].active{background:#4a756f;box-shadow:inset 0 0 0 2px #789992}.mode-button[data-app-mode="texture"]{background:#3f586e;color:#fff}.mode-button[data-app-mode="texture"]:hover{background:#4a657c}.mode-button[data-app-mode="texture"].active{background:#557188;box-shadow:inset 0 0 0 2px #819bad}
+.format-picker{display:flex;align-items:center;gap:7px;color:#ccc;font-size:13px}.format-picker select{background:#30353a;color:#fff;border:1px solid #626a73;border-radius:6px;padding:9px 28px 9px 10px;font:inherit;cursor:pointer}
+#info{color:#bbb;font-size:13px}
+.controls{grid-column:1;grid-row:2;min-height:0;overflow-y:auto;background:#282828;padding:14px;border-radius:8px}
+.controls.hidden{display:none}.texture-controls{display:none}.texture-controls.active{display:block}.texture-note{color:#bbb;font-size:12px;line-height:1.5;margin:12px 0 0}
+.preset-panel{border:1px solid #465953;border-radius:6px;margin-bottom:12px;padding:8px;font-size:12px}.preset-panel summary{cursor:pointer;color:#d2e1dc;font-weight:600}.preset-row{display:flex;gap:5px;margin-top:8px;align-items:center}.preset-row select,.preset-row input{min-width:0;flex:1;width:0;background:#303735;color:#eee;border:1px solid #63746e;border-radius:4px;padding:7px;font:inherit}.preset-row button{padding:7px 8px;font-size:12px;border-radius:4px;background:#46635b}.preset-note{margin:7px 0 0;color:#bbb;font-size:11px;line-height:1.5}.preset-status{color:#d2e1dc;line-height:1.5;overflow-wrap:anywhere}.preset-status:empty{display:none}.preset-status:not(:empty){margin-top:6px}
+.map-tabs{display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:16px}.map-tab{background:#3b3b3b;color:#ddd;padding:8px 10px}.map-tab.active{background:#3683d9;color:#fff}
+.map-panel{display:none;flex-direction:column;gap:10px}.map-panel.current{display:flex}.check-row{display:flex!important;justify-content:flex-start!important;align-items:center;gap:8px!important}
+.effect-picker{margin-bottom:14px}.effect-picker-title{display:block;margin-bottom:7px;font-size:13px;font-weight:600;color:#ccc}.effect-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}.effect-tab{min-height:34px;padding:6px 4px;border-radius:4px;background:#3b3b3b;color:#ddd;font-size:12px;line-height:1.15}.effect-tab.active{background:#3683d9;color:#fff;box-shadow:inset 0 0 0 1px #8dc5ff}
+.control{display:none;flex-direction:column;gap:8px;margin:0}.control.current{display:flex}
+.control label{display:flex;justify-content:space-between;gap:8px}
+.scope-row{display:flex;align-items:center;gap:7px}.scope{flex:1;background:#444;padding:8px 10px;font-size:13px}.scope.active{background:#3683d9}.scope-edit{display:none;color:#9dccff;font-size:12px}.control.local .scope-edit{display:block}.control.editing{outline:2px solid #6cb0ff;outline-offset:5px;border-radius:4px}.scope-radius{display:none}.control.local .scope-radius{display:block}
+input[type=range]{width:100%;accent-color:#6cb0ff}.ends{display:flex;justify-content:space-between;color:#b9b9b9;font-size:12px}
+main{grid-column:2;grid-row:2;min-width:0;min-height:0;background:#282828;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;transition:background .15s,box-shadow .15s}
+main.drag-over{background:#26384c;box-shadow:inset 0 0 0 3px #6cb0ff}
+canvas{display:block;max-width:100%;max-height:100%;cursor:crosshair}
+#dropHint{position:absolute;inset:18px;border:2px dashed #666;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#aaa;font-size:15px;pointer-events:none;transition:border-color .15s,color .15s,background .15s}
+main.has-image #dropHint{display:none}main.drag-over #dropHint{display:flex;border-color:#9dccff;color:#fff;background:rgba(54,131,217,.16)}
+#message{grid-column:1/-1;min-height:1.3em;color:#bbb;font-size:13px}
+@media(max-width:760px){body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto auto}.controls{grid-column:1;grid-row:3;max-height:38vh}main{grid-column:1;grid-row:2}}
+</style>
+</head>
+<body>
+<header>
+<h1>建築パース仕上げ</h1>
+<div class="mode-switch" aria-label="作業モード"><button type="button" class="mode-button active" data-app-mode="photo">写真調整</button><button type="button" class="mode-button" data-app-mode="texture">テクスチャマップ</button></div>
+<label class="file">画像を開く<input id="file" type="file" accept="image/png,image/jpeg,image/webp"></label>
+<label class="format-picker" for="saveFormat">保存形式 <select id="saveFormat"><option value="jpeg" selected>JPEG</option><option value="png">PNG</option></select></label>
+<button id="save" disabled>高画質JPEGで保存</button>
+<button id="compare" disabled>元画像と比較</button>
+<span id="info">画像を選んでください</span>
+</header>
+<section class="controls" id="photoControls">
+<details class="preset-panel">
+<summary>写真プリセット</summary>
+<div class="preset-row"><select id="presetList" aria-label="保存したプリセット"><option value="">プリセットを選択</option></select><button type="button" id="presetApply" disabled>適用</button><button type="button" id="presetDelete" disabled>削除</button></div>
+<div class="preset-row"><input id="presetName" type="text" maxlength="80" placeholder="保存する名前" aria-label="プリセット名"><button type="button" id="presetSave">保存</button></div>
+<p class="preset-note">調整値と範囲を保存（画像は含みません）。このブラウザ・同じ開き方で使えます。</p>
+<div id="presetStatus" class="preset-status" role="status" aria-live="polite"></div>
+</details>
+<div class="effect-picker"><span class="effect-picker-title">調整項目</span><div class="effect-tabs" id="effectTabs">
+<button type="button" class="effect-tab active" data-effect-tab="brightness">明るさ</button><button type="button" class="effect-tab" data-effect-tab="contrast">コントラスト</button>
+<button type="button" class="effect-tab" data-effect-tab="highlights">明るい部分</button><button type="button" class="effect-tab" data-effect-tab="shadows">暗い部分</button>
+<button type="button" class="effect-tab" data-effect-tab="saturation">彩度</button><button type="button" class="effect-tab" data-effect-tab="temperature">色温度</button>
+<button type="button" class="effect-tab" data-effect-tab="vignette">周辺減光</button><button type="button" class="effect-tab" data-effect-tab="blur">ぼかし</button>
+<button type="button" class="effect-tab" data-effect-tab="grain">粒状感</button><button type="button" class="effect-tab" data-effect-tab="sharpness">シャープ</button>
+</div></div>
+<div class="control" data-effect="brightness"><label for="brightness">明るさ <span id="bv">0.00 EV</span></label><input id="brightness" type="range" min="-2" max="2" step="0.05" value="0"><div class="ends"><span>暗い</span><span>明るい</span></div></div>
+<div class="control" data-effect="contrast"><label for="contrast">コントラスト <span id="cv">100%</span></label><input id="contrast" type="range" min="0" max="200" step="1" value="100"><div class="ends"><span>やわらかい</span><span>くっきり</span></div></div>
+<div class="control" data-effect="highlights"><label for="highlights">明るい部分 <span id="hv">0</span></label><input id="highlights" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>暗くする</span><span>明るくする</span></div></div>
+<div class="control" data-effect="shadows"><label for="shadows">暗い部分 <span id="shv">0</span></label><input id="shadows" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>暗くする</span><span>明るくする</span></div></div>
+<div class="control" data-effect="saturation"><label for="saturation">彩度 <span id="satv">100%</span></label><input id="saturation" type="range" min="0" max="200" step="1" value="100"><div class="ends"><span>色を抑える</span><span>鮮やか</span></div></div>
+<div class="control" data-effect="temperature"><label for="temperature">色温度 <span id="tv">0</span></label><input id="temperature" type="range" min="-100" max="100" step="1" value="0"><div class="ends"><span>冷たい色</span><span>暖かい色</span></div></div>
+<div class="control" data-effect="vignette"><label for="vignette">周辺減光 <span id="vv">0</span></label><input id="vignette" type="range" min="0" max="100" step="1" value="0"><div class="ends"><span>変えない</span><span>暗く</span></div></div>
+<div class="control" data-effect="blur"><label for="blur">ぼかし <span id="blv">0 px</span></label><input id="blur" type="range" min="0" max="60" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div></div>
+<div class="control" data-effect="grain"><label for="grain">粒状感 <span id="gv">0</span></label><input id="grain" type="range" min="0" max="30" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div><label for="size">粒子サイズ <span id="sv">1 px</span></label><input id="size" type="range" min="1" max="4" step="1" value="1"></div>
+<div class="control" data-effect="sharpness"><label for="sharpness">シャープ <span id="sharpv">0</span></label><input id="sharpness" type="range" min="0" max="100" step="1" value="0"><div class="ends"><span>なし</span><span>強く</span></div></div>
+</section>
+<section class="controls texture-controls" id="textureControls">
+<div class="effect-picker"><span class="effect-picker-title">生成するマップ</span><div class="map-tabs" id="mapTabs">
+<button type="button" class="map-tab active" data-map="normal">ノーマルマップ</button>
+<button type="button" class="map-tab" data-map="ao">アンビエントオクルージョン（AO）</button>
+<button type="button" class="map-tab" data-map="height">ハイトマップ</button>
+</div></div>
+<div class="map-panel current" data-map-panel="normal">
+<label for="normalStrength">凹凸の強さ <span id="normalStrengthValue">2.0</span></label><input id="normalStrength" type="range" min="0.2" max="6" step="0.1" value="2">
+<label for="normalSmooth">なめらかさ <span id="normalSmoothValue">1 px</span></label><input id="normalSmooth" type="range" min="0" max="8" step="1" value="1">
+<label class="check-row"><input id="normalInvertY" type="checkbox"> 緑（Y）方向を反転</label>
+</div>
+<div class="map-panel" data-map-panel="ao">
+<label for="aoStrength">影の強さ <span id="aoStrengthValue">65%</span></label><input id="aoStrength" type="range" min="0" max="100" step="1" value="65">
+<label for="aoRadius">影の広がり <span id="aoRadiusValue">6 px</span></label><input id="aoRadius" type="range" min="1" max="24" step="1" value="6">
+</div>
+<div class="map-panel" data-map-panel="height">
+<label for="heightContrast">高低差 <span id="heightContrastValue">120%</span></label><input id="heightContrast" type="range" min="20" max="300" step="1" value="120">
+<label for="heightSmooth">なめらかさ <span id="heightSmoothValue">1 px</span></label><input id="heightSmooth" type="range" min="0" max="12" step="1" value="1">
+<label class="check-row"><input id="heightInvert" type="checkbox"> 白黒を反転</label>
+</div>
+<p class="texture-note">明るさを高さとして解析します。マップは元画像と同じ解像度のPNGで保存されます。</p>
+</section>
+<main><canvas id="preview"></canvas><div id="dropHint">画像をここにドロップ</div></main>
+<div id="message">画像は縮小表示です。保存は元解像度。各項目の「範囲」で個別のピンと円を設定できます。</div>
+<script>
+const file=document.getElementById('file'),save=document.getElementById('save'),compare=document.getElementById('compare');
+const saveFormat=document.getElementById('saveFormat');
+const info=document.getElementById('info'),message=document.getElementById('message'),preview=document.getElementById('preview'),main=document.querySelector('main');
+const photoControls=document.getElementById('photoControls'),textureControls=document.getElementById('textureControls');
+const effectIds=['brightness','contrast','highlights','shadows','saturation','temperature','vignette','blur','grain','sharpness'];
+const names={brightness:'明るさ',contrast:'コントラスト',highlights:'明るい部分',shadows:'暗い部分',saturation:'彩度',temperature:'色温度',vignette:'周辺減光',blur:'ぼかし',grain:'粒状感',sharpness:'シャープ'};
+const states=Object.fromEntries(effectIds.map(id=>[id,{mode:'global',x:.5,y:.5,radius:35}]));
+let source=null,filename='仕上げ',timer=0,activeEffect='brightness',compareMode=false,appMode='photo',activeMap='normal';
+function clamp(v){return Math.max(0,Math.min(255,v))}
+function smooth(t){t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)}
+function mask(id,x,y,w,h){const s=states[id];if(s.mode==='global')return 1;const r=Math.min(w,h)*s.radius/100,d=Math.hypot(x-s.x*w,y-s.y*h);return 1-smooth((d-r*.72)/(r*.38||1))}
+function hash(x,y){let z=(Math.imul(x,374761393)+Math.imul(y,668265263)+13579)|0;z=Math.imul(z^(z>>>13),1274126177);return((z^(z>>>16))>>>0)/4294967295}
+function values(){
+  const v={};effectIds.forEach(id=>v[id]=Number(document.getElementById(id).value));v.size=Number(document.getElementById('size').value);
+  document.getElementById('bv').textContent=v.brightness.toFixed(2)+' EV';document.getElementById('cv').textContent=v.contrast+'%';
+  document.getElementById('hv').textContent=v.highlights>0?'+'+v.highlights:String(v.highlights);document.getElementById('shv').textContent=v.shadows>0?'+'+v.shadows:String(v.shadows);
+  document.getElementById('satv').textContent=v.saturation+'%';document.getElementById('tv').textContent=v.temperature<0?'寒色 '+Math.abs(v.temperature):v.temperature>0?'暖色 '+v.temperature:'0';
+  document.getElementById('vv').textContent=String(v.vignette);document.getElementById('blv').textContent=v.blur+' px';document.getElementById('gv').textContent=String(v.grain);
+  document.getElementById('sv').textContent=v.size+' px';document.getElementById('sharpv').textContent=String(v.sharpness);return v;
+}
+function initScopes(){
+  document.querySelectorAll('.control[data-effect]').forEach(box=>{const id=box.dataset.effect;if(id==='vignette')return;const row=document.createElement('div');row.className='scope-row';
+    row.innerHTML='<button type="button" class="scope active" data-mode="global">全体</button><button type="button" class="scope" data-mode="local">範囲</button>';
+    const radius=document.createElement('div');radius.className='scope-radius';radius.innerHTML='<label>範囲の広さ <span>35%</span></label><input type="range" min="8" max="100" value="35" step="1">';
+    box.append(row,radius);row.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{states[id].mode=btn.dataset.mode;activeEffect=id;
+      row.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b===btn));box.classList.toggle('local',states[id].mode==='local');selectEffect(id);draw();
+      message.textContent=states[id].mode==='local'?names[id]+'の範囲を編集中。':names[id]+'を画像全体に適用します。';}));
+    radius.querySelector('input').addEventListener('input',e=>{states[id].radius=Number(e.target.value);radius.querySelector('span').textContent=e.target.value+'%';activeEffect=id;selectEffect(id);schedule()});
+    box.addEventListener('pointerdown',()=>{activeEffect=id;selectEffect(id)});
+  });selectEffect(activeEffect);
+}
+function selectEffect(id){if(id==='vignette')states.vignette.mode='global';document.querySelectorAll('.effect-tab').forEach(b=>b.classList.toggle('active',b.dataset.effectTab===id));document.querySelectorAll('.control[data-effect]').forEach(b=>{const current=b.dataset.effect===id;b.classList.toggle('current',current);b.classList.toggle('editing',current&&states[id].mode==='local')})}
+const PRESET_KEY='perspective_editor_photo_presets_v1';
+const presetList=document.getElementById('presetList'),presetName=document.getElementById('presetName'),presetStatus=document.getElementById('presetStatus');
+const presetApply=document.getElementById('presetApply'),presetDelete=document.getElementById('presetDelete');
+function presetNotice(text){presetStatus.textContent=text}
+function validatePreset(input){
+  if(!input||typeof input!=='object'||typeof input.name!=='string'||!input.name.trim()||input.name.trim().length>80)throw Error('invalid preset');
+  const clean={name:input.name.trim(),values:{},scopes:{}};
+  for(const id of [...effectIds,'size']){
+    const el=document.getElementById(id),v=input.values?.[id],min=Number(el.min),max=Number(el.max),step=Number(el.step);
+    if(typeof v!=='number'||!Number.isFinite(v)||v<min||v>max||Math.abs((v-min)/step-Math.round((v-min)/step))>1e-6)throw Error('invalid value');
+    clean.values[id]=v;
+  }
+  for(const id of effectIds){
+    const s=input.scopes?.[id];
+    if(!s||!['global','local'].includes(s.mode)||!['x','y','radius'].every(k=>typeof s[k]==='number'&&Number.isFinite(s[k]))||s.x<0||s.x>1||s.y<0||s.y>1||s.radius<.08||s.radius>1||Math.abs(s.radius*100-Math.round(s.radius*100))>1e-6)throw Error('invalid scope');
+    clean.scopes[id]={mode:id==='vignette'?'global':s.mode,x:s.x,y:s.y,radius:s.radius};
+  }
+  return clean;
+}
+function readPresets(){
+  let raw;
+  try{raw=localStorage.getItem(PRESET_KEY)}catch(e){presetNotice('ブラウザの保存領域を利用できません。写真調整はそのまま使えます。');return null}
+  if(raw===null)return [];
+  try{
+    const data=JSON.parse(raw);
+    if(data?.version!==1||!Array.isArray(data.presets))throw Error('invalid format');
+    const items=data.presets.map(validatePreset);
+    if(new Set(items.map(p=>p.name)).size!==items.length)throw Error('duplicate names');
+    return items;
+  }catch(e){presetNotice('プリセットの保存データを読み込めません。既存データの保護のため保存・適用を中止しました。');return null}
+}
+function writePresets(items){
+  try{localStorage.setItem(PRESET_KEY,JSON.stringify({version:1,presets:items}));return true}
+  catch(e){presetNotice('保存できませんでした。ブラウザの保存許可や空き容量をご確認ください。');return false}
+}
+function refreshPresets(items,selected=presetList.value){
+  presetList.replaceChildren(new Option('プリセットを選択',''));
+  for(const p of items)presetList.add(new Option(p.name,p.name));
+  presetList.value=items.some(p=>p.name===selected)?selected:'';
+  presetApply.disabled=presetDelete.disabled=!presetList.value;
+}
+function capturePreset(name){
+  return validatePreset({name,values:values(),scopes:Object.fromEntries(effectIds.map(id=>[id,{mode:states[id].mode,x:states[id].x,y:states[id].y,radius:states[id].radius/100}]))});
+}
+function savePhotoPreset(){
+  if(appMode!=='photo')return;
+  const name=presetName.value.trim();
+  if(!name||name.length>80){presetNotice('名前を1〜80文字で入力してください。');presetName.focus();return}
+  const items=readPresets();if(!items)return;
+  const index=items.findIndex(p=>p.name===name);
+  if(index!==-1&&!window.confirm('「'+name+'」を現在の調整で上書きしますか？')){presetNotice('上書きを取り消しました。');return}
+  let next;try{next=capturePreset(name)}catch(e){presetNotice('調整値を保存できませんでした。値と範囲をご確認ください。');return}
+  if(index===-1)items.push(next);else items[index]=next;
+  if(!writePresets(items))return;
+  refreshPresets(items,name);presetName.value=name;presetNotice('「'+name+'」を保存しました。');
+}
+function applyPhotoPreset(){
+  if(appMode!=='photo')return;
+  const items=readPresets();if(!items)return;
+  const selected=items.find(p=>p.name===presetList.value);
+  if(!selected){refreshPresets(items);presetNotice('適用するプリセットを選んでください。');return}
+  for(const id of [...effectIds,'size'])document.getElementById(id).value=selected.values[id];
+  for(const id of effectIds){
+    const s=selected.scopes[id];Object.assign(states[id],{mode:id==='vignette'?'global':s.mode,x:s.x,y:s.y,radius:Math.round(s.radius*100)});
+  }
+  document.querySelectorAll('.control[data-effect]').forEach(box=>{
+    const s=states[box.dataset.effect];box.classList.toggle('local',s.mode==='local');
+    box.querySelectorAll('.scope').forEach(button=>button.classList.toggle('active',button.dataset.mode===s.mode));
+    const radius=box.querySelector('.scope-radius');if(radius){radius.querySelector('input').value=s.radius;radius.querySelector('span').textContent=s.radius+'%'}
+  });
+  compareMode=false;compare.textContent='元画像と比較';clearTimeout(timer);values();selectEffect(activeEffect);draw();
+  presetName.value=selected.name;presetNotice('「'+selected.name+'」を適用しました。範囲の位置は画像に合わせて調整できます。');
+}
+function deletePhotoPreset(){
+  if(appMode!=='photo')return;
+  const items=readPresets();if(!items)return;
+  const name=presetList.value;if(!items.some(p=>p.name===name)){refreshPresets(items);return}
+  if(!window.confirm('プリセット「'+name+'」を削除しますか？')){presetNotice('削除を取り消しました。');return}
+  const remaining=items.filter(p=>p.name!==name);if(!writePresets(remaining))return;
+  refreshPresets(remaining,'');if(presetName.value===name)presetName.value='';presetNotice('「'+name+'」を削除しました。');
+}
+function initPresets(){
+  const items=readPresets();refreshPresets(items||[]);
+  document.getElementById('presetSave').addEventListener('click',savePhotoPreset);
+  presetApply.addEventListener('click',applyPhotoPreset);presetDelete.addEventListener('click',deletePhotoPreset);
+  presetList.addEventListener('change',()=>{presetApply.disabled=presetDelete.disabled=!presetList.value;if(presetList.value)presetName.value=presetList.value});
+  presetName.addEventListener('keydown',event=>{if(event.key==='Enter'&&!event.isComposing){event.preventDefault();savePhotoPreset()}});
+  window.addEventListener('storage',event=>{if(event.key===PRESET_KEY||event.key===null){const items=readPresets();refreshPresets(items||[])}});
+}
+function applyTone(canvas,v){const ctx=canvas.getContext('2d',{willReadFrequently:true}),frame=ctx.getImageData(0,0,canvas.width,canvas.height),p=frame.data,w=canvas.width,h=canvas.height;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4,r=p[i],g=p[i+1],b=p[i+2],gray=r*.2126+g*.7152+b*.0722,lit=gray/255;let rgb=[r,g,b];
+    let m=mask('saturation',x,y,w,h),sat=1+(v.saturation/100-1)*m;rgb=rgb.map(c=>gray+(c-gray)*sat);
+    m=mask('brightness',x,y,w,h);const exposure=Math.pow(2,v.brightness*m);rgb=rgb.map(c=>c*exposure);
+    m=mask('contrast',x,y,w,h);const con=1+(v.contrast/100-1)*m;rgb=rgb.map(c=>(c-128)*con+128);
+    m=mask('highlights',x,y,w,h);const hi=v.highlights*lit*lit*.8*m;rgb=rgb.map(c=>c+hi);
+    m=mask('shadows',x,y,w,h);const sh=v.shadows*(1-lit)*(1-lit)*.8*m;rgb=rgb.map(c=>c+sh);
+    m=mask('temperature',x,y,w,h);rgb[0]+=v.temperature*.28*m;rgb[2]-=v.temperature*.32*m;
+    m=mask('vignette',x,y,w,h);const dx=(x-w/2)/(w/2),dy=(y-h/2)/(h/2),edge=Math.min(1,(dx*dx+dy*dy)/2),vig=1-v.vignette/100*edge*m;rgb=rgb.map(c=>c*vig);
+    m=mask('grain',x,y,w,h);const noise=v.grain?(hash(Math.floor(x/v.size),Math.floor(y/v.size))*2-1)*v.grain*m:0;
+    p[i]=clamp(rgb[0]+noise);p[i+1]=clamp(rgb[1]+noise);p[i+2]=clamp(rgb[2]+noise);
+  }ctx.putImageData(frame,0,0);
+}
+function applyFiltered(canvas,id,amount,scale){if(amount<=0)return;const w=canvas.width,h=canvas.height,tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;const tc=tmp.getContext('2d');
+  tc.filter='blur('+(id==='blur'?Math.max(1,amount*scale):Math.max(.7,1.2*scale))+'px)';tc.drawImage(canvas,0,0);const ctx=canvas.getContext('2d',{willReadFrequently:true}),base=ctx.getImageData(0,0,w,h),soft=tc.getImageData(0,0,w,h),a=base.data,b=soft.data;
+  for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4,area=mask(id,x,y,w,h),m=id==='blur'&&states.blur.mode==='local'?1-area:area;for(let k=0;k<3;k++)a[i+k]=id==='blur'?a[i+k]*(1-m)+b[i+k]*m:clamp(a[i+k]+(a[i+k]-b[i+k])*(amount/45)*m)}ctx.putImageData(base,0,0);
+}
+function process(canvas,scale){const v=values();applyTone(canvas,v);applyFiltered(canvas,'blur',v.blur,scale);applyFiltered(canvas,'sharpness',v.sharpness,scale)}
+function textureValues(){
+  const v={normalStrength:Number(document.getElementById('normalStrength').value),normalSmooth:Number(document.getElementById('normalSmooth').value),normalInvertY:document.getElementById('normalInvertY').checked,
+    aoStrength:Number(document.getElementById('aoStrength').value),aoRadius:Number(document.getElementById('aoRadius').value),heightContrast:Number(document.getElementById('heightContrast').value),heightSmooth:Number(document.getElementById('heightSmooth').value),heightInvert:document.getElementById('heightInvert').checked};
+  document.getElementById('normalStrengthValue').textContent=v.normalStrength.toFixed(1);document.getElementById('normalSmoothValue').textContent=v.normalSmooth+' px';
+  document.getElementById('aoStrengthValue').textContent=v.aoStrength+'%';document.getElementById('aoRadiusValue').textContent=v.aoRadius+' px';
+  document.getElementById('heightContrastValue').textContent=v.heightContrast+'%';document.getElementById('heightSmoothValue').textContent=v.heightSmooth+' px';return v;
+}
+function blurGray(input,w,h,r){r=Math.max(0,Math.round(r));if(!r)return new Float32Array(input);const horizontal=new Float32Array(w*h),out=new Float32Array(w*h),prefix=new Float64Array(Math.max(w,h)+1);
+  for(let y=0;y<h;y++){prefix[0]=0;for(let x=0;x<w;x++)prefix[x+1]=prefix[x]+input[y*w+x];for(let x=0;x<w;x++){const a=Math.max(0,x-r),b=Math.min(w-1,x+r);horizontal[y*w+x]=(prefix[b+1]-prefix[a])/(b-a+1)}}
+  for(let x=0;x<w;x++){prefix[0]=0;for(let y=0;y<h;y++)prefix[y+1]=prefix[y]+horizontal[y*w+x];for(let y=0;y<h;y++){const a=Math.max(0,y-r),b=Math.min(h-1,y+r);out[y*w+x]=(prefix[b+1]-prefix[a])/(b-a+1)}}return out;
+}
+function sourceGray(canvas){const ctx=canvas.getContext('2d',{willReadFrequently:true}),frame=ctx.getImageData(0,0,canvas.width,canvas.height),p=frame.data,g=new Float32Array(canvas.width*canvas.height);for(let i=0,j=0;i<p.length;i+=4,j++)g[j]=(p[i]*.2126+p[i+1]*.7152+p[i+2]*.0722)/255;return g}
+function renderTexture(canvas,map,scale){const ctx=canvas.getContext('2d',{willReadFrequently:true}),w=canvas.width,h=canvas.height,v=textureValues(),raw=sourceGray(canvas),frame=ctx.createImageData(w,h),p=frame.data;
+  if(map==='normal'){const g=blurGray(raw,w,h,Math.round(v.normalSmooth*scale)),strength=v.normalStrength;for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=y*w+x,l=g[y*w+Math.max(0,x-1)],r=g[y*w+Math.min(w-1,x+1)],u=g[Math.max(0,y-1)*w+x],d=g[Math.min(h-1,y+1)*w+x];let nx=-(r-l)*strength,ny=-(d-u)*strength;if(v.normalInvertY)ny=-ny;const inv=1/Math.hypot(nx,ny,1),j=i*4;p[j]=Math.round((nx*inv*.5+.5)*255);p[j+1]=Math.round((ny*inv*.5+.5)*255);p[j+2]=Math.round((inv*.5+.5)*255);p[j+3]=255}}
+  else if(map==='ao'){const radius=Math.max(1,Math.round(v.aoRadius*scale)),average=blurGray(raw,w,h,radius),strength=v.aoStrength/100*3;for(let i=0;i<raw.length;i++){const occlusion=Math.max(0,average[i]-raw[i]),value=Math.round(255*(1-Math.min(1,occlusion*strength))),j=i*4;p[j]=p[j+1]=p[j+2]=value;p[j+3]=255}}
+  else{const g=blurGray(raw,w,h,Math.round(v.heightSmooth*scale)),contrast=v.heightContrast/100;for(let i=0;i<g.length;i++){let value=Math.max(0,Math.min(1,(g[i]-.5)*contrast+.5));if(v.heightInvert)value=1-value;const c=Math.round(value*255),j=i*4;p[j]=p[j+1]=p[j+2]=c;p[j+3]=255}}
+  ctx.putImageData(frame,0,0);
+}
+function overlay(){const s=states[activeEffect];if(s.mode!=='local'||compareMode)return;const c=preview.getContext('2d'),x=s.x*preview.width,y=s.y*preview.height,r=Math.min(preview.width,preview.height)*s.radius/100;
+  c.save();c.strokeStyle='#fff';c.lineWidth=2;c.shadowColor='#000';c.shadowBlur=3;c.beginPath();c.arc(x,y,9,0,Math.PI*2);c.moveTo(x-15,y);c.lineTo(x+15,y);c.moveTo(x,y-15);c.lineTo(x,y+15);c.stroke();c.setLineDash([7,5]);c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.stroke();c.restore();}
+function fitPreview(){if(!source)return;const scale=Math.min(main.clientWidth/source.width,main.clientHeight/source.height);preview.style.width=Math.max(1,Math.floor(source.width*scale))+'px';preview.style.height=Math.max(1,Math.floor(source.height*scale))+'px'}
+function draw(){timer=0;if(!source)return;const scale=Math.min(1,1400/source.width,900/source.height);preview.width=Math.max(1,Math.round(source.width*scale));preview.height=Math.max(1,Math.round(source.height*scale));preview.getContext('2d').drawImage(source,0,0,preview.width,preview.height);if(appMode==='texture')renderTexture(preview,activeMap,scale);else{if(!compareMode)process(preview,scale);overlay()}fitPreview()}
+function schedule(){if(appMode==='photo')values();else textureValues();clearTimeout(timer);timer=setTimeout(draw,70)}
+document.querySelectorAll('input[type=range],input[type=checkbox]').forEach(el=>el.addEventListener('input',schedule));
+preview.addEventListener('pointerdown',event=>{if(appMode!=='photo')return;const s=states[activeEffect];if(s.mode!=='local'){message.textContent='先に調整項目の「範囲」を選んでください。';return}const rect=preview.getBoundingClientRect();s.x=Math.max(0,Math.min(1,(event.clientX-rect.left)/rect.width));s.y=Math.max(0,Math.min(1,(event.clientY-rect.top)/rect.height));message.textContent=names[activeEffect]+'の中心を移動しました。';draw()});
+document.querySelectorAll('.effect-tab').forEach(tab=>tab.addEventListener('click',()=>{activeEffect=tab.dataset.effectTab;selectEffect(activeEffect);message.textContent=names[activeEffect]+'を調整します。';draw()}));
+function updateSaveLabel(){save.textContent=(saveFormat.value==='png'?'PNG':'高画質JPEG')+'で保存'}
+saveFormat.addEventListener('change',updateSaveLabel);
+document.querySelectorAll('.mode-button').forEach(button=>button.addEventListener('click',()=>{appMode=button.dataset.appMode;document.querySelectorAll('.mode-button').forEach(b=>b.classList.toggle('active',b===button));photoControls.classList.toggle('hidden',appMode!=='photo');textureControls.classList.toggle('active',appMode==='texture');compare.hidden=appMode==='texture';updateSaveLabel();message.textContent=appMode==='texture'?'生成するマップを選び、強さを調整してください。':'各項目で「全体」または「範囲」を選べます。';compareMode=false;compare.textContent='元画像と比較';draw()}));
+document.querySelectorAll('.map-tab').forEach(button=>button.addEventListener('click',()=>{activeMap=button.dataset.map;document.querySelectorAll('.map-tab').forEach(b=>b.classList.toggle('active',b===button));document.querySelectorAll('.map-panel').forEach(panel=>panel.classList.toggle('current',panel.dataset.mapPanel===activeMap));draw()}));
+initScopes();values();textureValues();updateSaveLabel();initPresets();
+if('ResizeObserver' in window)new ResizeObserver(fitPreview).observe(main);else window.addEventListener('resize',fitPreview);
+compare.addEventListener('click',()=>{compareMode=!compareMode;compare.textContent=compareMode?'編集後に戻す':'元画像と比較';draw()});
+async function loadImageFile(selected){if(!selected)return;if(!['image/png','image/jpeg','image/webp'].includes(selected.type)){message.textContent='画像ファイル（PNG・JPG・WebP）を選んでください。';return}
+  try{const bitmap=await createImageBitmap(selected);if(source)source.close();source=bitmap;filename=selected.name.replace(/\.(png|jpe?g|webp)$/i,'');info.textContent=selected.name+' · '+bitmap.width+' × '+bitmap.height+' px';message.textContent=appMode==='texture'?'生成するマップを選び、強さを調整してください。':'各項目で「全体」または「範囲」を選べます。';save.disabled=false;compare.disabled=false;main.classList.add('has-image');draw()}catch(e){message.textContent='画像を開けませんでした: '+e.message}}
+file.addEventListener('change',()=>loadImageFile(file.files?.[0]));
+document.addEventListener('dragover',event=>event.preventDefault());document.addEventListener('drop',event=>{event.preventDefault();if(!main.contains(event.target))message.textContent='画像表示欄へ画像ファイルをドロップしてください。'});
+main.addEventListener('dragenter',event=>{event.preventDefault();main.classList.add('drag-over')});main.addEventListener('dragover',event=>{event.preventDefault();if(event.dataTransfer)event.dataTransfer.dropEffect='copy';main.classList.add('drag-over')});
+main.addEventListener('dragleave',event=>{if(!main.contains(event.relatedTarget))main.classList.remove('drag-over')});main.addEventListener('drop',event=>{event.preventDefault();event.stopPropagation();main.classList.remove('drag-over');const selected=event.dataTransfer?.files?.[0];if(!selected){message.textContent='画像ファイルが見つかりませんでした。';return}loadImageFile(selected)});
+save.addEventListener('click',()=>{if(!source)return;save.disabled=true;message.textContent='元の解像度で保存中…';setTimeout(()=>{try{const full=document.createElement('canvas');full.width=source.width;full.height=source.height;const ctx=full.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,full.width,full.height);ctx.drawImage(source,0,0);if(appMode==='texture')renderTexture(full,activeMap,1);else process(full,1);const format=saveFormat.value,isPng=format==='png',type=isPng?'image/png':'image/jpeg',extension=isPng?'.png':'.jpg',baseSuffix=appMode==='texture'?{normal:'_normal',ao:'_ao',height:'_height'}[activeMap]:'_仕上げ',suffix=baseSuffix+extension;full.toBlob(blob=>{if(!blob){message.textContent='保存できませんでした。';save.disabled=false;return}const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename+suffix;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);message.textContent='元の解像度の'+(isPng?'PNG':'JPEG')+'で保存しました。';save.disabled=false},type,isPng?undefined:.92)}catch(e){message.textContent='保存できませんでした: '+e.message;save.disabled=false}},30)});
+</script>
+</body>
+</html>
