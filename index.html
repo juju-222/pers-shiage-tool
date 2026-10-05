@@ -18,6 +18,7 @@ button:disabled{opacity:.45;cursor:default}.file input{display:none}button.on{ba
 #info{color:#bbb;font-size:13px}
 .controls{grid-column:1;grid-row:2;min-height:0;overflow-y:auto;background:#282828;padding:14px;border-radius:8px}
 .controls.hidden{display:none}.texture-controls{display:none}.texture-controls.active{display:block}.note{color:#aaa;font-size:12px;line-height:1.55;margin:4px 0 0}
+.auto-panel{margin-bottom:12px}.auto-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.auto-grid button{font-size:12px;padding:8px 4px;border-radius:5px;background:#5c4b2f}.auto-grid button:not(:disabled):hover{background:#73603d}.auto-grid .auto-main{grid-column:1/-1;background:#b07a2a;font-size:13px}.auto-grid .auto-main:not(:disabled):hover{background:#c88c33}
 .histo{margin-bottom:12px}.histo canvas{width:100%;height:70px;display:block;background:#1b1b1b;border-radius:5px}.clip-info{display:flex;justify-content:space-between;font-size:11px;color:#999;margin-top:4px}.clip-info .warn{color:#ff8a7a}
 .preset-panel{border:1px solid #465953;border-radius:6px;margin-bottom:12px;padding:8px;font-size:12px}.preset-panel summary{cursor:pointer;color:#d2e1dc;font-weight:600}.preset-row{display:flex;gap:5px;margin-top:8px;align-items:center}.preset-row select,.preset-row input{min-width:0;flex:1;width:0;background:#303735;color:#eee;border:1px solid #63746e;border-radius:4px;padding:7px;font:inherit}.preset-row button{padding:7px 8px;font-size:12px;border-radius:4px;background:#46635b}.preset-note{margin:7px 0 0;color:#bbb;font-size:11px;line-height:1.5}.preset-status{color:#d2e1dc;line-height:1.5;overflow-wrap:anywhere}.preset-status:empty{display:none}.preset-status:not(:empty){margin-top:6px}
 .map-tabs{display:grid;grid-template-columns:1fr;gap:6px;margin-bottom:16px}.map-tab{background:#3b3b3b;color:#ddd;padding:8px 10px}.map-tab.active{background:#3683d9;color:#fff}
@@ -57,6 +58,11 @@ main.has-image #dropHint{display:none}main.drag-over #dropHint{display:flex;bord
 </header>
 <section class="controls" id="photoControls">
 <div class="histo"><canvas id="histogram" width="560" height="140"></canvas><div class="clip-info"><span id="clipLow">黒つぶれ –</span><span id="clipHigh">白とび –</span></div></div>
+<div class="auto-panel"><span class="effect-picker-title">おまかせ仕上げ（ボタン1つで全体を調整）</span><div class="auto-grid">
+<button type="button" class="auto-main" data-look="auto" disabled>自動補正</button>
+<button type="button" data-look="day" disabled>昼・すっきり</button><button type="button" data-look="soft" disabled>室内・やわらか</button>
+<button type="button" data-look="sunset" disabled>夕景</button><button type="button" data-look="night" disabled>夜景</button>
+</div><p class="note">画像を分析して、各項目の値を自動で決めます。あとから各項目で微調整できます。ブラシで塗った内容はそのまま残ります。</p></div>
 <details class="preset-panel">
 <summary>写真プリセット</summary>
 <div class="preset-row"><select id="presetList" aria-label="保存したプリセット"><option value="">プリセットを選択</option></select><button type="button" id="presetApply" disabled>適用</button><button type="button" id="presetDelete" disabled>削除</button></div>
@@ -355,7 +361,7 @@ function pushHistory(){
   if(history[hIndex]&&history[hIndex].key===key)return;
   history=history.slice(0,hIndex+1);history.push({key,state:s});if(history.length>40)history.shift();hIndex=history.length-1;updateUndo();
 }
-function updateUndo(){const ok=!!source&&appMode==='photo'&&!busy;undoBtn.disabled=!(ok&&hIndex>0);redoBtn.disabled=!(ok&&hIndex<history.length-1);resetAllBtn.disabled=!ok}
+function updateUndo(){const ok=!!source&&appMode==='photo'&&!busy;document.querySelectorAll('[data-look]').forEach(b=>b.disabled=!ok);undoBtn.disabled=!(ok&&hIndex>0);redoBtn.disabled=!(ok&&hIndex<history.length-1);resetAllBtn.disabled=!ok}
 function restoreState(s){
   for(const id of PARAM_IDS)$(id).value=s.values[id];for(const id of SCOPE_IDS)Object.assign(states[id],s.scopes[id]);curves=cloneCurves(s.curves);
   if(s.paintVersion!==paintVersion){paintCtx.clearRect(0,0,paintCanvas.width,paintCanvas.height);if(s.paint)paintCtx.putImageData(s.paint,0,0);paintSnap=s.paint;paintVersion=s.paintVersion;hasPaint=!!s.paint;paintDataCache=null;paintRev++}
@@ -480,6 +486,40 @@ curveCanvas.addEventListener('dblclick',e=>{const pts=curves[curveChannel],i=nea
 document.querySelectorAll('#curveChannels button').forEach(b=>b.addEventListener('click',()=>{curveChannel=b.dataset.channel;document.querySelectorAll('#curveChannels button').forEach(x=>x.classList.toggle('active',x===b));drawCurve()}));
 $('curveS').addEventListener('click',()=>{curves[curveChannel]=[[0,0],[.25,.2],[.75,.8],[1,1]];drawCurve();values();requestDraw();pushHistory()});
 $('curveReset').addEventListener('click',()=>{curves[curveChannel]=[[0,0],[1,1]];drawCurve();values();requestDraw();pushHistory()});
+
+/* ===== おまかせ仕上げ ===== */
+function analyzeImage(){
+  const d=basePreview.data,n=d.length/4,h=new Uint32Array(256);let chroma=0,sr=0,sb=0,mid=0;
+  for(let i=0;i<d.length;i+=4){const r=d[i],g=d[i+1],b=d[i+2],l=Math.round(.2126*r+.7152*g+.0722*b);h[l]++;chroma+=Math.max(r,g,b)-Math.min(r,g,b);if(l>40&&l<220){sr+=r;sb+=b;mid++}}
+  const pct=q=>{let c=0;const t=q*n;for(let i=0;i<256;i++){c+=h[i];if(c>=t)return i}return 255};
+  let hi=0;for(let i=250;i<256;i++)hi+=h[i];
+  return{p5:pct(.05),p50:pct(.5),p95:pct(.95),hiClip:hi/n,chroma:chroma/n,cast:mid?(sb-sr)/mid:0};
+}
+function autoValues(a){
+  const lin=c=>SRGB_TO_LIN[Math.max(1,Math.min(255,Math.round(c)))],spread=a.p95-a.p5;
+  return{brightness:Math.max(-1,Math.min(1,Math.log2(lin(118)/lin(a.p50))*.6)),
+    contrast:spread<170?100+Math.min(35,(170-spread)*.35):spread>235?95:100,
+    highlights:a.hiClip>.005?-Math.min(60,a.hiClip*800):0,
+    shadows:a.p5<25?Math.min(45,(25-a.p5)*1.6):0,
+    saturation:a.chroma<25?115:a.chroma<40?108:a.chroma>90?95:100,
+    temperature:Math.max(-25,Math.min(25,a.cast*.6)),
+    vignette:8,blur:0,grain:3,size:1,sharpness:15,glow:0,glowRadius:35,glowThreshold:80};
+}
+const LOOKS={
+  auto:{name:'自動補正',fn:()=>{}},
+  day:{name:'昼・すっきり',fn:v=>{v.contrast+=10;v.saturation+=8;v.temperature-=5;v.sharpness=25}},
+  soft:{name:'室内・やわらか',fn:(v,c)=>{v.shadows+=15;v.contrast-=10;v.temperature+=8;v.glow=15;v.glowThreshold=85;c.rgb=[[0,.05],[1,1]]}},
+  sunset:{name:'夕景',fn:(v,c)=>{v.brightness=v.brightness*.5-.1;v.temperature+=25;v.saturation+=10;v.glow=30;v.glowThreshold=78;v.vignette=20;c.b=[[0,0],[.25,.29],[1,1]];c.r=[[0,0],[.75,.8],[1,1]]}},
+  night:{name:'夜景',fn:(v,c)=>{v.brightness=Math.min(0,v.brightness)*.5;v.shadows=Math.min(v.shadows,15);v.contrast+=12;v.temperature-=5;v.glow=45;v.glowRadius=45;v.glowThreshold=72;v.vignette=25;v.grain=4;c.b=[[0,0],[.25,.29],[1,1]]}}
+};
+function applyLook(id){
+  if(!source||appMode!=='photo')return;const v=autoValues(analyzeImage()),c=newCurves();LOOKS[id].fn(v,c);
+  for(const k of Object.keys(v)){const el=$(k),min=Number(el.min),max=Number(el.max),step=Number(el.step),x=Math.min(max,Math.max(min,Math.round((v[k]-min)/step)*step+min));el.value=String(Number(x.toFixed(4)))}
+  for(const k of SCOPE_IDS)states[k].mode='global';curves=c;
+  syncScopeUI();values();drawCurve();selectEffect(activeEffect);pushHistory();requestDraw();
+  message.textContent='「'+LOOKS[id].name+'」で全体を調整しました。気になる項目は個別に微調整してください（Ctrl+Zで元に戻せます）。';
+}
+document.querySelectorAll('[data-look]').forEach(b=>b.addEventListener('click',()=>applyLook(b.dataset.look)));
 
 /* ===== ヒストグラム ===== */
 function drawHistogram(d){
